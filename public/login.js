@@ -47,6 +47,5 @@ function parseJwt(token) {
     const decodedData = JSON.parse(window.atob(base64));
 
     return decodedData.authorities[0].authority
-    console.log(userRole)
-    return userRole
+    
 }
