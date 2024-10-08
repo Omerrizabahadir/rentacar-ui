@@ -6,6 +6,7 @@ const BASE_PATH = "http://localhost:8080/"
 
 
 async function fetchBrands(){
+        console.log(jwtToken);
     
        const response = await fetch(BASE_PATH + "brand", {
         method: 'GET',
@@ -17,12 +18,12 @@ async function fetchBrands(){
        
        const data = await response.json();
        console.log(data);
-       
+
        displayBrands(data)
     }
 
 function displayBrands(brands){
-    const brandSelect = document.getElementById('brandSelect');
+    const brandSelect = document.getElementById("brandSelect");
     brandSelect.innerHTML = '';
 
     brands.forEach(brand => {
