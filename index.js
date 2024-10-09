@@ -4,11 +4,11 @@ const customerId = localStorage.getItem("customerId");
 const BASE_PATH = "http://localhost:8080/"
 const BASE_IMAGE_PATH = "/Users/macbook/Documents/GitHub/rentacar/"
 
-
+let rentItems = [];
 
 async function fetchBrands(){
         console.log(jwtToken);
-    
+    try{
        const response = await fetch(BASE_PATH + "brand", {
         method: 'GET',
         headers: {
@@ -16,13 +16,47 @@ async function fetchBrands(){
             'Authorization': 'Bearer ' + jwtToken
         }
        });
+       if (!response.ok) {
+        console.error("response status :" + response.status)
+        throw new Error("Failed to get brands, response status : " + response.status)
+    }
        
        const data = await response.json();
        console.log(data);
 
        displayBrands(data)
+    }catch(error){
+        console.error("Error fetching brands: ", error);
+        
+        window.location.href = "login.html"
+      
+    }
     }
 
+    async function fetchCarByBrand(brandId){
+        const endPointUrl = BASE_PATH + "car/brand/" +brandId;
+        try {
+            const response = await fetch(endPointUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + jwtToken
+                }
+            });
+            if(!response.ok){
+                throw new Error("Failed to get cars by brand id, response.status : " + response.status)
+            }
+            const data = await response.json();
+            console.log(data);
+
+            displayCars(data);
+            
+        }catch (error) {
+            console.error("Error fetching cars : ", error);
+            
+        }
+    }
+    
 function displayBrands(brands){
     const brandSelect = document.getElementById("brandSelect");
     brandSelect.innerHTML = '';
@@ -39,52 +73,88 @@ function displayCars(cars){
     const carList = document.getElementById("carList");
     carList.innerHTML = '';
     cars.forEach( car => {
-        const carCard = document.getElementById("div");
+        
+        const carCard = document.createElement("div");
         carCard.classList.add("col-md-2", "mb-4");
 
         const carImage = document.createElement("img");
         carImage.src = BASE_IMAGE_PATH + car.image
         carImage.alt = car.name;
-        carImage.style.maxWidth = "150px";
-        carImage.style.maxHeight = "150px";
+        carImage.style.maxWidth = "175px";
+        carImage.style.maxHeight = "175px";
 
-        const carBody = document.createElement("div");
-        carBody.classList.add("card-body");
-        carBody.innerHTML = `
-        <h5 class = "card-title">${car.name}</h5>;
-        <p class = "card-text">${car.dailyPrice}</p>
-        <button class = "btn btn-primary" onclick = 'addToCard(${JSON.stringify(car)})'>Add to Card</button>
-        `;
+        const cardBody = document.createElement("div");
+        cardBody.classList.add("card-body");
+        cardBody.innerHTML = `
+       <div class="card-body text-center">
+        <h5 class="card-title fw-bold">${car.modelName}</h5> <!-- Başlık boyutunu artırmak için h5 kullandık -->
+        <p class="card-text text-muted">${car.gearBox}</p> <!-- GearBox için daha hafif bir renk -->
+        <p class="card-text fw-bold fs-5">${car.dailyPrice} TL</p> <!-- Fiyatı daha belirgin hale getirmek için fs-5 kullandık -->
+        <p class="card-text"><small class="text-secondary">${car.carStatus}</small></p> <!-- Statü için daha yumuşak bir renk -->
+        <button class="btn btn-success mt-3" onclick='addToRent(${JSON.stringify(car)})'>Add To Rental</button> <!-- Butona margin ekleyerek üstten boşluk bıraktık -->
+    </div>
+`;
+
         carCard.appendChild(carImage);
-        carCard.appendChild(carBody);
+        carCard.appendChild(cardBody);
+        
+        carList.appendChild(carCard);
 
     });
 }
 
-async function fetchCarByBrand(brandId){
-    const endPointUrl = BASE_PATH + "car/brand/" +brandId;
-    try {
-        const response = await fetch(endPointUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + jwtToken
-            }
-        });
-        if(!response.ok){
-            throw new Error("Failed to get cars by brand id, response.status : " + response.status)
-        }
-        const data = await response.json();
-        console.log(data);
-        
-    }catch (error) {
-        console.error("Error fetching cars : ", error);
-        
+function addToRent(car){
+    const carCountInRent = rentItems.filter(item => item.id === car.id).length;
+    if(car.carAvailableStock > 0 && carCountInRent < car.carAvailableStock){
+        rentItems.push(car);
+        updateRent();
+        updateRentalVisibility();
     }
 }
-    
+
+function updateRent(){
+    const rent = document.getElementById("rent");
+    rent.innerHTML = '';
+
+    rentItems.forEach((item, index) => {
+        const rentItemElement = document.createElement("li");
+        rentItemElement.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+
+        const itemNameElement = document.createComment("span");
+        rentItemElement.textContent = `${item.brandName} - ${item.dailyPrice} TL`;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("btn", "btn-danger");
+        deleteButton.innerHTML = '<i class = "bi bi-trash"></>';
+
+        deleteButton.onclick = function () {
+            removeFromRent(index);
+        };
+        rentItemElement.appendChild(itemNameElement);
+        rentItemElement.appendChild(deleteButton);
+        rent.appendChild(rentItemElement);
+
+    });
+}
+
+function removeFromRent(index){
+    rentItems.splice(index, 1)[0];
+    updateRent();
+    updateRentalVisibility();
+}
+
+function updateRentalVisibility(){
+    if(rentItems.length > 0){
+        document.getElementById("rentalButton").style.display = "block";
+    }else{
+        document.getElementById("rentalButton").style.display = "none";
+    }
+}
+
 
 document.addEventListener("DOMContentLoaded", async function () {
+   updateRentalVisibility();
+
     await fetchBrands();
 
     const brandSelect = document.getElementById("brandSelect");
