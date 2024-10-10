@@ -124,9 +124,33 @@ function addToRent(car){
             console.error("Rental button not found!");
         }
     } else if (car.carAvailableStock === 0) {
-        alert("This car is out of stock. Please choose another car.");
+        showModal("This car is out of stock. Please choose another car.");
     } else {
-        alert("There are " + (car.carAvailableStock - carCountInRent) + " car left in stock.");
+        showModal("There are " + (car.carAvailableStock - carCountInRent) + " car left in stock.");
+    }
+    modalClose();
+}
+function showModal(message= ""){
+    const modal = document.getElementById("modal");
+    const modalMessage = document.getElementById("modalMessage");
+    
+    if (message) {
+        modalMessage.textContent = message; // Mesaj varsa modal açılır
+        modal.style.display = "block";
+    } else {
+        modal.style.display = "none"; // Mesaj yoksa modal kapanır
+    }
+}
+// Kapatma butonu için tıklama olayı
+document.getElementById("modalClose").onclick = function() {
+    showModal(); // Modalı kapat
+}
+
+// Dışarı tıklama ile modalı kapatma
+window.onclick = function(event) {
+    const modal = document.getElementById("modal");
+    if (event.target === modal) {
+        showModal(); // Modalı kapat
     }
 }
 
