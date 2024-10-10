@@ -104,16 +104,29 @@ function displayCars(cars){
 }
 
 function addToRent(car){
+    
     const carCountInRent = rentItems.filter(item => item.id === car.id).length;
+    console.log("carCountInRent : "+ carCountInRent);
+   
     if (car.carAvailableStock > 0 && carCountInRent < car.carAvailableStock) {
         rentItems.push(car);
         console.log("Car added to rentals:", car);
         updateRent();
+        updateRentalVisibility();
         
-        // Rental button'ın durumunu kontrol etmeden önce kontrol edin
+        
         const rentalButton = document.getElementById("rentalButton");
         console.log("Before updateRentalVisibility:", rentalButton);
-        updateRentalVisibility();
+       
+        if (rentalButton) {
+            console.log("Rental button is found.");
+        } else {
+            console.error("Rental button not found!");
+        }
+    } else if (car.carAvailableStock === 0) {
+        alert("This car is out of stock. Please choose another car.");
+    } else {
+        alert("There are " + (car.carAvailableStock - carCountInRent) + " car left in stock.");
     }
 }
 
@@ -141,7 +154,7 @@ function updateRent(){
         rent.appendChild(rentItemElement);
 
     });
-    const rentalCount = document.getElementById("rentalCount");
+     const rentalCount = document.getElementById("rentalCount");
     rentalCount.textContent = `+ ${rentItems.length}`;
 }
 
