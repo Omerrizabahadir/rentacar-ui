@@ -141,8 +141,8 @@ function updateRent(){
         rent.appendChild(rentItemElement);
 
     });
-     // Toplam kiralama sayısını güncelle
-     document.getElementById("rentalCount").textContent = rentItems.length;
+    const rentalCount = document.getElementById("rentalCount");
+    rentalCount.textContent = `+ ${rentItems.length}`;
 }
 
 function removeFromRent(index){
