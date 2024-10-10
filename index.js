@@ -87,11 +87,11 @@ function displayCars(cars){
         cardBody.classList.add("card-body");
         cardBody.innerHTML = `
        <div class="card-body text-center">
-        <h5 class="card-title fw-bold">${car.modelName}</h5> <!-- Başlık boyutunu artırmak için h5 kullandık -->
-        <p class="card-text text-muted">${car.gearBox}</p> <!-- GearBox için daha hafif bir renk -->
-        <p class="card-text fw-bold fs-5">${car.dailyPrice} TL</p> <!-- Fiyatı daha belirgin hale getirmek için fs-5 kullandık -->
-        <p class="card-text"><small class="text-secondary">${car.carStatus}</small></p> <!-- Statü için daha yumuşak bir renk -->
-        <button class="btn btn-success mt-3" onclick='addToRent(${JSON.stringify(car)})'>Add To Rental</button> <!-- Butona margin ekleyerek üstten boşluk bıraktık -->
+        <h5 class="card-title fw-bold">${car.modelName}</h5> 
+        <p class="card-text text-muted">${car.gearBox}</p> 
+        <p class="card-text fw-bold fs-5">${car.dailyPrice} TL</p> 
+        <p class="card-text"><small class="text-secondary">${car.carStatus}</small></p> 
+        <button class="btn btn-success mt-3" onclick='addToRent(${JSON.stringify(car)})'>Add To Rental</button> 
     </div>
 `;
 
@@ -113,6 +113,7 @@ function addToRent(car){
 }
 
 function updateRent(){
+    console.log("Rent Items : ", rentItems);
     const rent = document.getElementById("rent");
     rent.innerHTML = '';
 
@@ -120,12 +121,12 @@ function updateRent(){
         const rentItemElement = document.createElement("li");
         rentItemElement.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
 
-        const itemNameElement = document.createComment("span");
-        rentItemElement.textContent = `${item.brandName} - ${item.dailyPrice} TL`;
+        const itemNameElement = document.createElement("span");
+        rentItemElement.textContent = `${item.modelName} - ${item.dailyPrice} TL`;
 
         const deleteButton = document.createElement("button");
         deleteButton.classList.add("btn", "btn-danger");
-        deleteButton.innerHTML = '<i class = "bi bi-trash"></>';
+        deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
 
         deleteButton.onclick = function () {
             removeFromRent(index);
