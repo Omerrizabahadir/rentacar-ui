@@ -105,9 +105,14 @@ function displayCars(cars){
 
 function addToRent(car){
     const carCountInRent = rentItems.filter(item => item.id === car.id).length;
-    if(car.carAvailableStock > 0 && carCountInRent < car.carAvailableStock){
+    if (car.carAvailableStock > 0 && carCountInRent < car.carAvailableStock) {
         rentItems.push(car);
+        console.log("Car added to rentals:", car);
         updateRent();
+        
+        // Rental button'ın durumunu kontrol etmeden önce kontrol edin
+        const rentalButton = document.getElementById("rentalButton");
+        console.log("Before updateRentalVisibility:", rentalButton);
         updateRentalVisibility();
     }
 }
@@ -136,6 +141,8 @@ function updateRent(){
         rent.appendChild(rentItemElement);
 
     });
+     // Toplam kiralama sayısını güncelle
+     document.getElementById("rentalCount").textContent = rentItems.length;
 }
 
 function removeFromRent(index){
@@ -145,18 +152,26 @@ function removeFromRent(index){
 }
 
 function updateRentalVisibility(){
-    if(rentItems.length > 0){
-        document.getElementById("rentalButton").style.display = "block";
-    }else{
-        document.getElementById("rentalButton").style.display = "none";
+    const rentalButton = document.getElementById("rentalButton");
+    console.log("Checking rental button...", rentalButton); 
+    if (!rentalButton) {
+        console.error("Rental button not found!");
+        return; 
+    }
+    
+    if (rentItems.length > 0) {
+        rentalButton.style.display = "block";
+    } else {
+        rentalButton.style.display = "none";
     }
 }
 
 
 document.addEventListener("DOMContentLoaded", async function () {
-   updateRentalVisibility();
-
+  
     await fetchBrands();
+    updateRentalVisibility();
+
 
     const brandSelect = document.getElementById("brandSelect");
     brandSelect.addEventListener("change", async function () {
