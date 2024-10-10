@@ -128,7 +128,6 @@ function addToRent(car){
     } else {
         showModal("There are " + (car.carAvailableStock - carCountInRent) + " car left in stock.");
     }
-    modalClose();
 }
 function showModal(message= ""){
     const modal = document.getElementById("modal");
