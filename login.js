@@ -27,9 +27,9 @@ function submitForm(){
 
         const role = parseJwt(data.token)
 
-        if(role == "ROLE_ADMIN"){
-            window.location.href = "index.html"
-        }else if (role == "ROLE_USER") {
+        if(role === "ROLE_ADMIN"){
+            window.location.href = "admin.html"
+        }else if (role === "ROLE_USER") {
             window.location.href = "index.html"
         }
     }).catch(error => {
