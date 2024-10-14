@@ -1,5 +1,5 @@
     const BASE_PATH = "http://localhost:8080/"
-    const BASE_IMAGE_PATH_= "/Users/macbook/Documents/GitHub/rentacar/"
+    const BASE_IMAGE_PATH = "/Users/macbook/Documents/GitHub/rentacar/"
     const jwtToken = localStorage.getItem('jwtToken');
 
 
@@ -39,7 +39,7 @@
             body: formData
         }).then(response => {
             if (!response.ok) {
-                throw new Error("Car ekleme isteği başarısız durum kodu : " + response.status)
+                throw new Error("Car add request failed code status : " + response.status)
             }
            return response.json()
         }).then(data => {
@@ -48,3 +48,52 @@
             console.error('Error:', error);
         });
     }
+    async function getAllCars() {
+        try{
+            const response = await fetch(BASE_PATH + "car/all", {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'aplication/json',
+                    'Authorization': 'Bearer ' + jwtToken
+                }
+            });
+            if(!response.ok){
+                throw new Error("Failed to get cars, response status : " + response.status)
+            }
+            const carList = await response.json();
+            console.log("carList : ", carList)
+            await renderCarTable(carList);
+        }catch(error){
+            console.log("error : ", error)
+        }
+    }
+
+    async function renderCarTable(carList) {
+        const carTableBody = document.getElementById('carTableBody');
+        carTableBody.innerHTML =  "";
+
+        carList.forEach(car => {
+           const row = carTableBody.insertRow();
+           row.innerHTML = `
+                <td>${car.brandId}</td>
+                <td>${car.modelName}</td>
+                <td>${car.color}</td>
+                <td>${car.carStatus}</td>
+                <td>${car.active ? "Yes" : "No"}</td>
+                <td>${car.isRented ? "Yes" : "No"}</td>
+                <td>${car.carAvailableStock}</td>
+                <td>${car.gearBox}</td>
+                <td>${car.mileage}</td>
+                <td>${car.dailyPrice}</td>
+                <td><img src = "${BASE_IMAGE_PATH}${car.image}" alt = ${car.modelName}" width = "100"></td>
+                <td>
+                <button class  = "btn btn-warning" onclick = "updateCar(${car.id})">Update</button>
+                <button class  = "btn btn-danger" onclick = "deleteCar(${car.id})">Delete</button>
+                </td>
+                `;
+        });
+        
+    }
+     document.addEventListener("DOMContentLoaded", async ()=> {
+        await getAllCars();
+     })
