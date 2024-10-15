@@ -2,6 +2,7 @@
     const BASE_IMAGE_PATH = "/Users/macbook/Documents/GitHub/rentacar/"
     const jwtToken = localStorage.getItem('jwtToken');
 
+    
 
     async function addCar(){
 
@@ -42,8 +43,13 @@
                 throw new Error("Car add request failed code status : " + response.status)
             }
            return response.json()
+
         }).then(data => {
             console.log(data)
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addCarModal'));
+            modal.hide();
+            getAllCars();
+
         }).catch(error => {
             console.error('Error:', error);
         });
@@ -79,8 +85,8 @@
                 <td>${car.modelName}</td>
                 <td>${car.color}</td>
                 <td>${car.carStatus}</td>
-                <td>${car.active ? "Yes" : "No"}</td>
-                <td>${car.isRented ? "Yes" : "No"}</td>
+                <td>${car.active ? "true" : "false"}</td>
+                <td>${car.isRented ? "true" : "false"}</td>
                 <td>${car.carAvailableStock}</td>
                 <td>${car.gearBox}</td>
                 <td>${car.mileage}</td>
@@ -92,8 +98,35 @@
                 </td>
                 `;
         });
-        
     }
+    function deleteCar(carBrandId){
+
+       const confirmed = confirm("Are u sure want to delete this car?");
+
+        if(carBrandId !== 0) {
+            console.log("carBrandId : ", carBrandId);
+            
+            fetch(BASE_PATH + "car/" + carBrandId, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + jwtToken
+                }
+            }).then(response => {
+                
+                if(!response.ok){
+                    throw new Error("Car delete request failed code status : " + response.status)
+            }
+            getAllCars();
+            
+        }).catch(error => {
+            console.error('Error : ', error);
+        });
+    }
+}
+ 
      document.addEventListener("DOMContentLoaded", async ()=> {
         await getAllCars();
+
+       
      })
