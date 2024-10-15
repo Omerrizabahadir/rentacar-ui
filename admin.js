@@ -2,7 +2,7 @@
     const BASE_IMAGE_PATH = "/Users/macbook/Documents/GitHub/rentacar/"
     const jwtToken = localStorage.getItem('jwtToken');
 
-    
+    currentId = 0;
 
     async function addCar(){
 
@@ -46,8 +46,8 @@
 
         }).then(data => {
             console.log(data)
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addCarModal'));
-            modal.hide();
+            
+            hideCarModal('addCarModal');
             getAllCars();
 
         }).catch(error => {
@@ -94,19 +94,17 @@
                 <td><img src = "${BASE_IMAGE_PATH}${car.image}" alt = ${car.modelName}" width = "100"></td>
                 <td>
                 <button class  = "btn btn-warning" onclick = "updateCar(${car.id})">Update</button>
-                <button class  = "btn btn-danger" onclick = "deleteCar(${car.id})">Delete</button>
+                <button class  = "btn btn-danger" onclick="showCarModal(${car.id})"">Delete</button>
                 </td>
                 `;
         });
     }
-    function deleteCar(carBrandId){
+    function deleteCar(){
 
-       const confirmed = confirm("Are u sure want to delete this car?");
-
-        if(carBrandId !== 0) {
-            console.log("carBrandId : ", carBrandId);
+        if(currentId !== 0) {
+            console.log("carBrandId : ", currentId);
             
-            fetch(BASE_PATH + "car/" + carBrandId, {
+            fetch(BASE_PATH + "car/" + currentId, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -117,6 +115,7 @@
                 if(!response.ok){
                     throw new Error("Car delete request failed code status : " + response.status)
             }
+            hideCarModal('deleteCarModal')
             getAllCars();
             
         }).catch(error => {
@@ -124,6 +123,19 @@
         });
     }
 }
+    function showCarModal(carId){
+        currentId = carId
+        const deleteCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteCarModal'))
+        deleteCarModal.show();
+    }
+    function hideCarModal(modalId){
+        
+        const addCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addCarModal'));
+        addCarModal.hide(); 
+        
+        const deleteCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId));
+        deleteCarModal.hide();
+    }
  
      document.addEventListener("DOMContentLoaded", async ()=> {
         await getAllCars();
