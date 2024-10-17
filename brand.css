@@ -1,0 +1,24 @@
+/* alertlerin Css */
+     #success-alert,
+     #fail-alert {                   
+         display: none;
+         position: fixed;
+         top: 20px;
+         right: 20px;
+         z-index: 1050;
+         width: 300px;
+         padding: 15px;
+     }
+     #success-alert .close{
+         position: absolute;
+         top: 1px;
+         right: -15px;
+         z-index: 1040; 
+      /* alertin .close düğmesinin görünümünü kontrol etmek için  alert içindeki x işareti yazının altında kaldığı için ekledim*/
+      #fail-alert .close {
+         position: absolute;
+         top: 1px;
+         right: -15px;
+         z-index: 1040; /* Kapatma düğmesini uyarının üzerinde göstermek için */
+     }
+    }
