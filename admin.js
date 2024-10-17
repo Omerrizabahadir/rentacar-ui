@@ -242,7 +242,7 @@
     }
      
      async function closeUpdateCarModal(){
-        console.log("modal close")
+       
         const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updateCarModal'))   
         modal.hide();
 }
