@@ -235,11 +235,17 @@
                     throw new Error("")
                 }
                 getAllCars();
+                closeUpdateCarModal();
             }).catch(error => {
                 console.error('Error : ', error);
             });
-           hideCarModal('updateCarModal');
     }
+     
+     async function closeUpdateCarModal(){
+        console.log("modal close")
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updateCarModal'))   
+        modal.hide();
+}
  
      document.addEventListener("DOMContentLoaded", async ()=> {
         await getAllCars();
