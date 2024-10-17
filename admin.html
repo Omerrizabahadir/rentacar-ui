@@ -92,7 +92,7 @@
                 <div class="modal-body">
                     <form id="addCarForm" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <label for="name" class="form-label">ModelName</label>
+                            <label for="modelName" class="form-label">Model Name</label>
                             <input type="text" class="form-control" id="modelName" required>
                         </div>
                         <div class="mb-3">
@@ -141,6 +141,69 @@
             </div>
         </div>
     </div>
+
+     <!-- Update Car Modal-->
+     <div class="modal fade" id="updateCarModal" tabindex="-1" aria-labelledby="updateCarModalLabel"
+     aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <h5 class="modal-title" id="updateCarModalLabel">Update Product</h5>
+                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+                 <form id="addCarForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <input type="hidden" class="form-control" id="updateCarId">
+                    </div>
+                     <div class="mb-3">
+                         <label for="modelName" class="form-label">Model Name</label>
+                         <input type="text" class="form-control" id="updateModelName" required>
+                     </div>
+                     <div class="mb-3">
+                        <label for="color" class="form-label">Color</label>
+                        <input type="text" class="form-control" id="updateColor" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="carStatus" class="form-label">Car Status</label>
+                        <input type="text" class="form-control" id="updateCarStatus" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <label for="isRented" class="form-check-label">Is Rented</label>
+                        <input type="checkbox" class="form-check-input" id="updateIsRented">
+                    </div>
+                    <div class="mb-3">
+                        <label for="carAvailableStock" class="form-label">Car Available Stock</label>
+                        <input type="number" class="form-control" id="updateCarAvailableStock" required>
+                    </div>
+                     <div class="mb-3">
+                         <label for="dailyPrice" class="form-label">Daily Price</label>
+                         <input type="number" class="form-control" id="updateDailyPrice" required>
+                     </div>
+                     <div class="mb-3">
+                        <label for="brandId" class="form-label">Brand Id</label>
+                        <input type="number" class="form-control" id="updateBrandId" required>
+                    </div>
+                     <div class="mb-3 form-check">
+                         <label for="carActive" class="form-check-label">Active</label>
+                         <input type="checkbox" class="form-check-input" id="updateCarActive" required>
+                     </div> <div class="mb-3">
+                        <label for="gearBox" class="form-label">Gear Box</label>
+                        <input type="text" class="form-control" id="updateGearBox" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="mileage" class="form-label">Mileage</label>
+                        <input type="number" class="form-control" id="updateMileage" required>
+                    </div>
+                     <div class="mb-3">
+                         <label for="carImage" class="form-label">Image</label>
+                         <input type="file" class="form-control" id="updateCarImage" accept="image/*">
+                     </div>
+                     <button type="button" class="btn btn-warning" onclick="saveUpdateCar()"> Update Car</button>
+             </div>
+         </div>
+     </div>
+ </div>
 
       <!-- Delete Car Modal-->
       <div class="modal fade" id="deleteCarModal" tabindex="-1" role="dialog"

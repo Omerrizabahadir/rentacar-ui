@@ -136,6 +136,110 @@
         const deleteCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId));
         deleteCarModal.hide();
     }
+    function updateCar(carId){
+        fetch(BASE_PATH + "car/" + carId, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + jwtToken
+            }
+        }).then(response => {
+            if(!response.ok) {
+                throw new Error("Car add request failed code.status : " + response.response.status)
+            } 
+            return response.json();
+        }).then(car => {
+            document.getElementById('updateCarId').value = car.id;
+            document.getElementById('updateModelName').value = car.modelName;
+            document.getElementById('updateColor').value = car.color;
+            document.getElementById('updateCarStatus').value = car.carStatus;
+            document.getElementById('updateCarActive').checked = car.active;
+            document.getElementById('updateIsRented').checked = car.isRented;
+            document.getElementById('updateGearBox').value = car.gearBox;
+            document.getElementById('updateMileage').value = car.mileage;
+            document.getElementById('updateDailyPrice').value = car.dailyPrice;
+
+            const updateCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updateCarModal'))
+            updateCarModal.show();
+
+        }).catch(error => {
+            console.error('Error : ',error);
+        })
+    }
+
+    function saveUpdateCar(){
+            const updateCarId = document.getElementById('updateCarId').value ;
+            console.log('updateCarId:', updateCarId); 
+            const updateBrandId = document.getElementById('updateBrandId').value;
+            const updateModelName = document.getElementById('updateModelName').value;
+            const updateColor = document.getElementById('updateColor').value;
+            const updateCarStatus = document.getElementById('updateCarStatus').value;
+            const updateCarActive = document.getElementById('updateCarActive').checked;
+            const updateIsRented = document.getElementById('updateIsRented').checked;
+            const updateCarAvailableStock = document.getElementById('updateCarAvailableStock').value;
+            const updateGearBox = document.getElementById('updateGearBox').value;
+            const updateMileage = document.getElementById('updateMileage').value;
+            const updateDailyPrice = document.getElementById('updateDailyPrice').value;
+
+            const updateCarImage = document.getElementById('updateCarImage');
+
+             // modelName kontrolü
+    if (!updateModelName) {
+        alert('Model adı boş olamaz!');
+        return; // İşlemi durdur
+    }
+            const carData = {
+                id: updateCarId,
+                brandId: updateBrandId,
+                modelName: updateModelName,
+                color: updateColor,
+                carStatus: updateCarStatus,
+                active: updateCarActive,
+                isRented: updateIsRented,
+                carAvailableStock: updateCarAvailableStock,
+                gearBox: updateGearBox,
+                mileage: updateMileage,
+                dailyPrice: updateDailyPrice
+            };
+            console.log('carData:', carData);
+
+            /*  ->eğer backend de update isteğini @ModelAtribute ile yaparsan formData'ya append leri alttaki gibi tek tek at.new Blob kullanmamalısın!!!!
+                ->eğer backend de update isteği @RequestPart ise  şunu kullan:
+                const formData = new FormData();                                                                      //formData nesnesi oluştur
+                formData.append('file', feditedSelectedImage = updateProductImage.files[0]);                          //file'ı ilk dosya olarak otomatik ekleyecek.feditedSelectedImage değişkenine updateProductImage input elementinden alınan ilk dosyayı atıyorsunuz. Yani, feditedSelectedImage ve updateProductImage.files[0] aynı dosyayı referans eder.
+                formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));    //Blob nesnesi, veri (bu örnekte JSON) ile birlikte bir veri kümesi oluşturur. Blob ile veri göndermek, genellikle FormData içinde JSON verisi göndermek için kullanılır.  yani productData sını bir json veri kümesine dönüştürüp product nesnesinin içine ekleyecek
+
+            */
+            const formData = new FormData();
+            formData.append('file', updateCarImage.files[0]); // Dosya yüklemesi
+            formData.append('id', updateCarId);
+            formData.append('brandId', updateBrandId);
+            formData.append('modelName', updateModelName);
+            formData.append('color', updateColor);
+            formData.append('carStatus', updateCarStatus);
+            formData.append('active', updateCarActive);
+            formData.append('isRented', updateIsRented);
+            formData.append('carAvailableStock', updateCarAvailableStock);
+            formData.append('gearBox', updateGearBox);
+            formData.append('mileage', updateMileage);
+            formData.append('dailyPrice', updateDailyPrice);
+
+            fetch(BASE_PATH + "car/update", {
+                method: 'PUT',
+                body: formData,
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken
+                }
+            }).then(response => {
+                if(!response.ok){
+                    throw new Error("")
+                }
+                getAllCars();
+            }).catch(error => {
+                console.error('Error : ', error);
+            });
+           hideCarModal('updateCarModal');
+    }
  
      document.addEventListener("DOMContentLoaded", async ()=> {
         await getAllCars();
