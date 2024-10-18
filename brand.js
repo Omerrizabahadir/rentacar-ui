@@ -227,6 +227,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('addBrandBtn').addEventListener("click", function () { //addEventListener da onclick="addBrand()" sil ve butonın id 'sini ekle buraya
         const brandName = document.getElementById('brandName').value; 
 
+        
+         if (!brandName) {
+            showFailAlert("Brand name cannot be empty!");
+            return; 
+        }
         fetch(BASE_PATH + "brand/create", {
             method: 'POST',
             headers: {
