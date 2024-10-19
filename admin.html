@@ -181,9 +181,7 @@
                          <input type="number" class="form-control" id="updateDailyPrice" required>
                      </div>
                      <div class="mb-3">
-                        <label for="brandId" class="form-label">Brand Id</label>
-                        <input type="number" class="form-control" id="updateBrandId" required>
-                    </div>
+                        <select id="updateCarBrandSelect" class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"></select>
                      <div class="mb-3 form-check">
                          <label for="carActive" class="form-check-label">Active</label>
                          <input type="checkbox" class="form-check-input" id="updateCarActive" required>
@@ -199,6 +197,7 @@
                          <label for="carImage" class="form-label">Image</label>
                          <input type="file" class="form-control" id="updateCarImage" accept="image/*">
                      </div>
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
                      <button type="button" class="btn btn-warning" onclick="saveUpdateCar()"> Update Car</button>
              </div>
          </div>

@@ -136,6 +136,8 @@
         const deleteCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId));
         deleteCarModal.hide();
     }
+
+     /* ------------------------Update-----------------------  */     
     function updateCar(carId){
         fetch(BASE_PATH + "car/" + carId, {
             method: 'GET',
@@ -159,6 +161,7 @@
             document.getElementById('updateMileage').value = car.mileage;
             document.getElementById('updateDailyPrice').value = car.dailyPrice;
 
+
             const updateCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updateCarModal'))
             updateCarModal.show();
 
@@ -170,7 +173,7 @@
     function saveUpdateCar(){
             const updateCarId = document.getElementById('updateCarId').value ;
             console.log('updateCarId:', updateCarId); 
-            const updateBrandId = document.getElementById('updateBrandId').value;
+            const updateCarBrandId = document.getElementById('updateCarBrandSelect').value;
             const updateModelName = document.getElementById('updateModelName').value;
             const updateColor = document.getElementById('updateColor').value;
             const updateCarStatus = document.getElementById('updateCarStatus').value;
@@ -190,7 +193,7 @@
     }
             const carData = {
                 id: updateCarId,
-                brandId: updateBrandId,
+                brandId: updateCarBrandId,
                 modelName: updateModelName,
                 color: updateColor,
                 carStatus: updateCarStatus,
@@ -213,7 +216,7 @@
             const formData = new FormData();
             formData.append('file', updateCarImage.files[0]); // Dosya yüklemesi
             formData.append('id', updateCarId);
-            formData.append('brandId', updateBrandId);
+            formData.append('brandId', updateCarBrandId);
             formData.append('modelName', updateModelName);
             formData.append('color', updateColor);
             formData.append('carStatus', updateCarStatus);
@@ -232,7 +235,7 @@
                 }
             }).then(response => {
                 if(!response.ok){
-                    throw new Error("")
+                    throw new Error("Car updating request failed status code : " , response.status)
                 }
                 getAllCars();
                 closeUpdateCarModal();
@@ -246,9 +249,62 @@
         const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updateCarModal'))   
         modal.hide();
 }
+
+//---------------------brands--------------------
+//api- call taking brands from backend 
+async function fetchBrands() {
+    console.log("jwt : " + jwtToken);
+    try {
+    const response = await fetch(BASE_PATH + "brand", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + jwtToken
+        }
+    });
+    if (!response.ok) {
+        console.error("response status :" + response.status)
+        throw new Error("Failed to get brands, response status : " + response.status)
+    }
+    const data = await response.json();
+    console.log(data);
+    displayBrandsWithSelectMenu(data);    
+                          
+}catch(error) {
+    console.error("Error fetching brands: ", error);
+     if (error.status === 403) { 
+    window.location.href = "login.html"
+    }
+    }
+}
+
+    function displayBrands(brands) {
+        const brandSelect = document.getElementById('brandSelect');
+        brandSelect.innerHTML = ''; 
+
+        brands.forEach(brand => {
+        const option = document.createElement('option'); 
+        option.value = brand.id;
+        option.text = brand.name;
+        brandSelect.appendChild(option);
+
+    });
+    }   
+
+    function displayBrandsWithSelectMenu(brands){
+        const brandSelect = document.getElementById('updateCarBrandSelect');
+        brandSelect.innerHTML = '';
+
+        brands.forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand.id;
+            option.text = brand.name;
+            brandSelect.appendChild(option);
+        });
+    }
  
      document.addEventListener("DOMContentLoaded", async ()=> {
         await getAllCars();
-
-       
+        await fetchBrands();
+    
      })
