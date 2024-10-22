@@ -1,258 +1,127 @@
-    const BASE_PATH = "http://localhost:8080/"
-    const BASE_IMAGE_PATH = "/Users/macbook/Documents/GitHub/rentacar/"
-    const jwtToken = localStorage.getItem('jwtToken');
+const BASE_PATH = "http://localhost:8080/"
+const BASE_IMAGE_PATH = "/Users/macbook/Documents/GitHub/rentacar/"
+const jwtToken = localStorage.getItem('jwtToken');
 
-    currentId = 0;
+var currentCarId = 0;
+var brands = [];
 
-    async function addCar(){
+async function addCar(){
 
-        const carBrandId = document.getElementById('brandSelect').value;
-        const fileInput = document.getElementById('carImage');
-        const modelName = document.getElementById('modelName').value;
-        const dailyPrice = document.getElementById('dailyPrice').value;
-        const carAvailableStock = document.getElementById('carAvailableStock').value;
-        const gearBox = document.getElementById('gearBox').value;
-        const color = document.getElementById('color').value;
-        const carStatus = document.getElementById('carStatus').value;
-        const active = document.getElementById('carActive').checked;
-        const isRented = document.getElementById('isRented').checked;
-        const mileage = document.getElementById('mileage').value;
+    const carBrandId = document.getElementById('brandSelect').value;
+    const fileInput = document.getElementById('carImage');
+    const modelName = document.getElementById('modelName').value;
+    const dailyPrice = document.getElementById('dailyPrice').value;
+    const carAvailableStock = document.getElementById('carAvailableStock').value;
+    const gearBox = document.getElementById('gearBox').value;
+    const color = document.getElementById('color').value;
+    const carStatus = document.getElementById('carStatus').value;
+    const active = document.getElementById('carActive').checked;
+    const isRented = document.getElementById('isRented').checked;
+    const mileage = document.getElementById('mileage').value;
 
-        const formData = new FormData();
-        console.log("formData", formData)
-        formData.append("file", fileInput.files[0]); // Yüklemek istediğiniz dosya
-        formData.append("brandId", carBrandId); // Brand ID
-        formData.append("modelName", modelName); // Model adı
-        formData.append("color", color); // Renk
-        formData.append("carStatus", carStatus); // Araç durumu
-        formData.append("active", active); // Aktif mi
-        formData.append("isRented", isRented); // Kiralandı mı
-        formData.append("carAvailableStock", carAvailableStock); // Mevcut stok
-        formData.append("gearBox", gearBox); // Vites türü
-        formData.append("mileage", mileage); // Kilometre
-        formData.append("dailyPrice", dailyPrice); // Günlük fiyat
+    const formData = new FormData();
+    console.log("formData", formData)
 
-        await fetch(BASE_PATH + "car/create", {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + jwtToken
-            },
-            body: formData
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error("Car add request failed code status : " + response.status)
-            }
-           return response.json()
+    formData.append("file", fileInput.files[0]); 
+    formData.append("brandId", carBrandId); 
+    formData.append("modelName", modelName); 
+    formData.append("color", color); 
+    formData.append("carStatus", carStatus); 
+    formData.append("active", active); 
+    formData.append("isRented", isRented); 
+    formData.append("carAvailableStock", carAvailableStock); 
+    formData.append("gearBox", gearBox); 
+    formData.append("mileage", mileage); 
+    formData.append("dailyPrice", dailyPrice); 
 
-        }).then(data => {
-            console.log(data)
-            
-            hideCarModal('addCarModal');
-            getAllCars();
+    const carData = {
+        
+        brandId: carBrandId,
+        modelName: modelName,
+        color: color,
+        carStatus: carStatus,
+        active:active,
+        isRented: isRented,
+        carAvailableStock: carAvailableStock,
+        gearBox: gearBox,
+        mileage: mileage,
+        dailyPrice: dailyPrice
 
-        }).catch(error => {
-            console.error('Error:', error);
-        });
-    }
-    async function getAllCars() {
-        try{
-            const response = await fetch(BASE_PATH + "car/all", {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'aplication/json',
-                    'Authorization': 'Bearer ' + jwtToken
-                }
-            });
-            if(!response.ok){
-                throw new Error("Failed to get cars, response status : " + response.status)
-            }
-            const carList = await response.json();
-            console.log("carList : ", carList)
-            await renderCarTable(carList);
-        }catch(error){
-            console.log("error : ", error)
+    };
+   
+    await fetch(BASE_PATH + "car/create", {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + jwtToken
+        },
+        body: formData
+    }).then(response => {
+        if (!response.ok) {
+            showFailAlert('Car add is unsuccessfull');
+            throw new Error("Car add request failed code status : " + response.status)
         }
-    }
+       return response.json()
 
-    async function renderCarTable(carList) {
-        const carTableBody = document.getElementById('carTableBody');
-        carTableBody.innerHTML =  "";
-
-        carList.forEach(car => {
-           const row = carTableBody.insertRow();
-           row.innerHTML = `
-                <td>${car.brandId}</td>
-                <td>${car.modelName}</td>
-                <td>${car.color}</td>
-                <td>${car.carStatus}</td>
-                <td>${car.active ? "true" : "false"}</td>
-                <td>${car.isRented ? "true" : "false"}</td>
-                <td>${car.carAvailableStock}</td>
-                <td>${car.gearBox}</td>
-                <td>${car.mileage}</td>
-                <td>${car.dailyPrice}</td>
-                <td><img src = "${BASE_IMAGE_PATH}${car.image}" alt = ${car.modelName}" width = "100"></td>
-                <td>
-                <button class  = "btn btn-warning" onclick = "updateCar(${car.id})">Update</button>
-                <button class  = "btn btn-danger" onclick="showCarModal(${car.id})"">Delete</button>
-                </td>
-                `;
-        });
-    }
-    function deleteCar(){
-
-        if(currentId !== 0) {
-            console.log("carBrandId : ", currentId);
-            
-            fetch(BASE_PATH + "car/" + currentId, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + jwtToken
-                }
-            }).then(response => {
-                
-                if(!response.ok){
-                    throw new Error("Car delete request failed code status : " + response.status)
-            }
-            hideCarModal('deleteCarModal')
-            getAllCars();
-            
-        }).catch(error => {
-            console.error('Error : ', error);
-        });
-    }
+    }).then(data => {
+        hideCarModal('addCarModal');
+        clearModalValues();
+        showSuccessAlert('Car added successfully')
+        getAllCar();
+       
+    }).catch(error => {
+        console.error('Error:', error);
+        showFailAlert('Car add is unsuccessfull ');
+    });
 }
-    function showCarModal(carId){
-        currentId = carId
-        const deleteCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteCarModal'))
-        deleteCarModal.show();
-    }
-    function hideCarModal(modalId){
-        
-        const addCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addCarModal'));
-        addCarModal.hide(); 
-        
-        const deleteCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId));
-        deleteCarModal.hide();
-    }
 
-     /* ------------------------Update-----------------------  */     
-    function updateCar(carId){
-        fetch(BASE_PATH + "car/" + carId, {
+async function getAllCar() {
+    try{
+        const response = await fetch(BASE_PATH + "car/all", {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + jwtToken
-            }
-        }).then(response => {
-            if(!response.ok) {
-                throw new Error("Car add request failed code.status : " + response.response.status)
-            } 
-            return response.json();
-        }).then(car => {
-            document.getElementById('updateCarId').value = car.id;
-            document.getElementById('updateModelName').value = car.modelName;
-            document.getElementById('updateColor').value = car.color;
-            document.getElementById('updateCarStatus').value = car.carStatus;
-            document.getElementById('updateCarActive').checked = car.active;
-            document.getElementById('updateIsRented').checked = car.isRented;
-            document.getElementById('updateGearBox').value = car.gearBox;
-            document.getElementById('updateMileage').value = car.mileage;
-            document.getElementById('updateDailyPrice').value = car.dailyPrice;
+            },
+            mode: 'cors' // CORS modunu belirtin
+        });
+        if(!response.ok){
+            throw new Error("Failed to get cars, response status : " + response.status)
+        }
+        const carList = await response.json();
+        console.log("carList : ", carList)
+        await renderCarTable(carList);
 
-
-            const updateCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updateCarModal'))
-            updateCarModal.show();
-
-        }).catch(error => {
-            console.error('Error : ',error);
-        })
+    }catch(error){
+        console.log("error : ", error)
     }
-
-    function saveUpdateCar(){
-            const updateCarId = document.getElementById('updateCarId').value ;
-            console.log('updateCarId:', updateCarId); 
-            const updateCarBrandId = document.getElementById('updateCarBrandSelect').value;
-            const updateModelName = document.getElementById('updateModelName').value;
-            const updateColor = document.getElementById('updateColor').value;
-            const updateCarStatus = document.getElementById('updateCarStatus').value;
-            const updateCarActive = document.getElementById('updateCarActive').checked;
-            const updateIsRented = document.getElementById('updateIsRented').checked;
-            const updateCarAvailableStock = document.getElementById('updateCarAvailableStock').value;
-            const updateGearBox = document.getElementById('updateGearBox').value;
-            const updateMileage = document.getElementById('updateMileage').value;
-            const updateDailyPrice = document.getElementById('updateDailyPrice').value;
-
-            const updateCarImage = document.getElementById('updateCarImage');
-
-             // modelName kontrolü
-    if (!updateModelName) {
-        alert('Model adı boş olamaz!');
-        return; // İşlemi durdur
-    }
-            const carData = {
-                id: updateCarId,
-                brandId: updateCarBrandId,
-                modelName: updateModelName,
-                color: updateColor,
-                carStatus: updateCarStatus,
-                active: updateCarActive,
-                isRented: updateIsRented,
-                carAvailableStock: updateCarAvailableStock,
-                gearBox: updateGearBox,
-                mileage: updateMileage,
-                dailyPrice: updateDailyPrice
-            };
-            console.log('carData:', carData);
-
-            /*  ->eğer backend de update isteğini @ModelAtribute ile yaparsan formData'ya append leri alttaki gibi tek tek at.new Blob kullanmamalısın!!!!
-                ->eğer backend de update isteği @RequestPart ise  şunu kullan:
-                const formData = new FormData();                                                                      //formData nesnesi oluştur
-                formData.append('file', feditedSelectedImage = updateProductImage.files[0]);                          //file'ı ilk dosya olarak otomatik ekleyecek.feditedSelectedImage değişkenine updateProductImage input elementinden alınan ilk dosyayı atıyorsunuz. Yani, feditedSelectedImage ve updateProductImage.files[0] aynı dosyayı referans eder.
-                formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));    //Blob nesnesi, veri (bu örnekte JSON) ile birlikte bir veri kümesi oluşturur. Blob ile veri göndermek, genellikle FormData içinde JSON verisi göndermek için kullanılır.  yani productData sını bir json veri kümesine dönüştürüp product nesnesinin içine ekleyecek
-
-            */
-            const formData = new FormData();
-            formData.append('file', updateCarImage.files[0]); // Dosya yüklemesi
-            formData.append('id', updateCarId);
-            formData.append('brandId', updateCarBrandId);
-            formData.append('modelName', updateModelName);
-            formData.append('color', updateColor);
-            formData.append('carStatus', updateCarStatus);
-            formData.append('active', updateCarActive);
-            formData.append('isRented', updateIsRented);
-            formData.append('carAvailableStock', updateCarAvailableStock);
-            formData.append('gearBox', updateGearBox);
-            formData.append('mileage', updateMileage);
-            formData.append('dailyPrice', updateDailyPrice);
-
-            fetch(BASE_PATH + "car/update", {
-                method: 'PUT',
-                body: formData,
-                headers: {
-                    'Authorization': 'Bearer ' + jwtToken
-                }
-            }).then(response => {
-                if(!response.ok){
-                    throw new Error("Car updating request failed status code : " , response.status)
-                }
-                getAllCars();
-                closeUpdateCarModal();
-            }).catch(error => {
-                console.error('Error : ', error);
-            });
-    }
-     
-     async function closeUpdateCarModal(){
-       
-        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updateCarModal'))   
-        modal.hide();
 }
 
-//---------------------brands--------------------
-//api- call taking brands from backend 
-async function fetchBrands() {
+async function renderCarTable(carList) {
+    const carTableBody = document.getElementById('carTableBody');
+    carTableBody.innerHTML =  "";
+
+    carList.forEach(car => {
+       const row = carTableBody.insertRow();
+       row.innerHTML = `
+            <td>${car.brandId}</td>
+            <td>${car.modelName}</td>
+            <td>${car.color}</td>
+            <td>${car.carStatus}</td>
+            <td>${car.active ? "true" : "false"}</td>
+            <td>${car.isRented ? "true" : "false"}</td>
+            <td>${car.carAvailableStock}</td>
+            <td>${car.gearBox}</td>
+            <td>${car.mileage}</td>
+            <td>${car.dailyPrice}</td>
+            <td><img src = "${BASE_IMAGE_PATH}${car.image}" alt = ${car.modelName}" width = "100"></td>
+            <td>
+            <button class  = "btn btn-warning" onclick = "updateCar(${car.id})">Update</button>
+            <button class="btn btn-danger" onclick="showDeleteCarModal(${car.id})">Delete</button>
+            </td>
+            `;
+    });
+}
+async function getBrands() {
     console.log("jwt : " + jwtToken);
     try {
     const response = await fetch(BASE_PATH + "brand", {
@@ -260,7 +129,8 @@ async function fetchBrands() {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + jwtToken
-        }
+        },
+         mode: 'cors' // CORS modunu belirtin
     });
     if (!response.ok) {
         console.error("response status :" + response.status)
@@ -268,43 +138,330 @@ async function fetchBrands() {
     }
     const data = await response.json();
     console.log(data);
-    displayBrandsWithSelectMenu(data);    
+    displayBrandsWithSelectMenu(data);  
+    displayBrands(data)  
                           
-}catch(error) {
+    }catch(error) {
     console.error("Error fetching brands: ", error);
      if (error.status === 403) { 
     window.location.href = "login.html"
     }
     }
+ }
+ function displayBrands(brands) {
+    const brandSelect = document.getElementById('brandSelect');
+    brandSelect.innerHTML = ''; 
+
+ brands.forEach(brand => {
+    const option = document.createElement('option'); 
+    option.value = brand.id;
+    option.text = brand.name;
+    brandSelect.appendChild(option);
+
+});
+}   
+
+function showSuccessAlert(message) {
+    let alert = document.getElementById('success-alert');
+    alert.style.display = 'block';
+    alert.style.opacity = 1;
+
+    let alertMessage = document.getElementById('successAlertMessage');
+    alertMessage.textContent = message;
+
+    setTimeout(() => {
+        let opacity = 1;
+        let timer = setInterval(() => {
+            if (opacity <= 0.1) {
+                clearInterval(timer);
+                alert.style.display = 'none';
+            } else {
+                opacity -= 0.1;
+                alert.style.opacity = opacity;
+            }
+        }, 50);
+    }, 3000); 
 }
 
-    function displayBrands(brands) {
-        const brandSelect = document.getElementById('brandSelect');
-        brandSelect.innerHTML = ''; 
+function showFailAlert(message) {
+    let alert = document.getElementById('fail-alert');
+    alert.style.display = 'block';
+    alert.style.opacity = 1;
 
-        brands.forEach(brand => {
-        const option = document.createElement('option'); 
+    let alertMessage = document.getElementById('failAlertMessage');
+    alertMessage.textContent = message;
+
+    setTimeout(() => {
+        let opacity = 1;
+        let timer = setInterval(() => {
+            if (opacity <= 0.1) {
+                clearInterval(timer);
+                alert.style.display = 'none';
+            } else {
+                opacity -= 0.1;
+                alert.style.opacity = opacity;
+            }
+        }, 50);
+    }, 3000); 
+}
+
+function showDeleteCarModal(carId) {
+    currentCarId=carId;
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("confirmDeleteModal"));
+    modal.show();
+}
+
+function hideCarModal(modalId){
+    
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId))
+    modal.hide();
+}
+
+
+//addCar ta ürünü eklerkemesini yapar gibi ekliyoruz ancak bunları boş göndersin diye value ların karşılığı '' boş olacak.addCar modalı açılınca sayfada ürünü ekledikten sonra modalın resmini name'ini,fiyatını... boşaltacak
+function clearModalValues(){
+    document.getElementById('modelName').value = '';
+    document.getElementById('color').value = '';
+    document.getElementById('carStatus').value = '';
+    document.getElementById('isRented').checked = false;
+    document.getElementById('carImage').value = '';
+    document.getElementById('carAvailableStock').value = '';
+    document.getElementById('dailyPrice').value = '';
+    document.getElementById('brandSelect').value = ''; //******** */
+    document.getElementById('carActive').checked = true;
+    document.getElementById('gearBox').value= '';
+    document.getElementById('mileage').value = '';
+    document.getElementById('carImage').value = '';
+     
+}
+
+//---------------------------------DELETE-------------------------------
+   /* 
+function deleteCar(carId){
+    if(!carId){
+        console.log("Car id is undefined or invalid")
+        return;
+    }
+    currentCarId = carId;
+
+    //Delete Confirm Modalını gösterme
+    const confirmDeleteModal = new bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteModal'));
+    confirmDeleteModal.show();
+}
+
+function confirmDeletion() {
+    console.log("Confirm deletion called for ID:", currentCarId);  
+    
+    if (currentCarId === 0) {  
+        console.error('No car ID available for deletion.');
+        return;      
+    }
+
+    fetch(BASE_PATH + "car/" + currentCarId, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + jwtToken
+        }
+    }).then(response => {
+        console.log("Fetch isteği yapıldı:", response);
+
+        if (!response.ok) {
+            throw new Error("Car delete request failed code status: " + response.status);
+        }
+        showSuccessAlert('Car is successfully deleted!');
+        getAllCar();
+        hideProductModal('confirmDeleteButton');
+
+    }).catch(error => {
+        console.error('Error: ', error);
+        showFailAlert('An error occurred while deleting the car');
+    }).finally(() => {
+        const confirmDeleteModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteModal'));
+        if (confirmDeleteModal) {
+            confirmDeleteModal.hide();
+        }
+    currentCarId = 0;
+});
+}
+*/
+function showDeleteCarModal(carId){
+    currentCarId=carId
+    const deleteCarModal =  bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteCarModal'))
+    deleteCarModal.show();
+}
+
+function deleteCar(){
+   
+    //const confirmed = confirm("Are you sure you want to delete car?");
+    
+   
+    if(currentCarId !==0){
+        console.error('No car ID available for deletion.');
+        return;
+    }
+        fetch(BASE_PATH + "car/" + currentCarId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + jwtToken
+            }
+            
+
+        }).then(response => {
+            console.log("Fetch isteği yapıldı:", response);
+    
+            if (!response.ok) {
+                throw new Error("Car delete request failed code status: " + response.status);
+            }
+            const deleteCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteCarModal'))
+            showSuccessAlert('Car deleted successfully');
+            deleteCarModal.hide();
+            getAllCar();
+
+    }).catch(error => {
+        console.error('Error : ', error)
+        showFailAlert('An error occurred while deleting the car');
+    }).finally(() => {
+        currentCarId = 0;
+    });
+}
+//showing and filling brands with select menu
+function displayBrandsWithSelectMenu(brands){
+    const brandSelect = document.getElementById('updateCarBrandSelect');
+    brandSelect.innerHTML = '';
+
+    brands.forEach(brand => {
+        const option = document.createElement('option');
         option.value = brand.id;
         option.text = brand.name;
         brandSelect.appendChild(option);
-
     });
-    }   
+}
 
-    function displayBrandsWithSelectMenu(brands){
+/* ------------------------Update-----------------------  */    
+function updateCar(carId){
+    fetch(BASE_PATH + "car/" + carId, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + jwtToken
+        }
+    }).then(response => {
+        if(!response.ok) {
+            throw new Error("Car add request failed code.status : " + response.response.status)
+        } 
+        return response.json();
+    }).then(car => {
+        document.getElementById('updateCarId').value = car.id;
+        document.getElementById('updateModelName').value = car.modelName;
+        document.getElementById('updateColor').value = car.color;
+        document.getElementById('updateCarStatus').value = car.carStatus;
+        document.getElementById('updateCarActive').checked = car.active;
+        document.getElementById('updateIsRented').checked = car.isRented;
+        document.getElementById('updateGearBox').value = car.gearBox;
+        document.getElementById('updateMileage').value = car.mileage;
+        document.getElementById('updateDailyPrice').value = car.dailyPrice;
+
+         // Markayı select menüsünden seç
         const brandSelect = document.getElementById('updateCarBrandSelect');
-        brandSelect.innerHTML = '';
+        brandSelect.value = car.brandId; // Markanın ID'sini seçili yap
 
-        brands.forEach(brand => {
-            const option = document.createElement('option');
-            option.value = brand.id;
-            option.text = brand.name;
-            brandSelect.appendChild(option);
-        });
-    }
- 
-     document.addEventListener("DOMContentLoaded", async ()=> {
-        await getAllCars();
-        await fetchBrands();
-    
-     })
+        const updateCarModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updateCarModal'))
+        updateCarModal.show();
+
+    }).catch(error => {
+        console.error('Error : ',error);
+    })
+}
+
+function saveUpdateCar(){
+
+    const updateCarId = document.getElementById('updateCarId').value ;
+    console.log('updateCarId:', updateCarId); 
+    const updateCarBrandId = document.getElementById('updateCarBrandSelect').value;
+    const updateModelName = document.getElementById('updateModelName').value;
+    const updateColor = document.getElementById('updateColor').value;
+    const updateCarStatus = document.getElementById('updateCarStatus').value;
+    const updateCarActive = document.getElementById('updateCarActive').checked;
+    const updateIsRented = document.getElementById('updateIsRented').checked;
+    const updateCarAvailableStock = document.getElementById('updateCarAvailableStock').value;
+    const updateGearBox = document.getElementById('updateGearBox').value;
+    const updateMileage = document.getElementById('updateMileage').value;
+    const updateDailyPrice = document.getElementById('updateDailyPrice').value;
+
+    const updateCarImage = document.getElementById('updateCarImage');
+
+     // modelName kontrolü
+if (!updateModelName) {
+alert('Model adı boş olamaz!');
+return; // İşlemi durdur
+}
+    const carData = {
+        id: updateCarId,
+        brandId: updateCarBrandId,
+        modelName: updateModelName,
+        color: updateColor,
+        carStatus: updateCarStatus,
+        active: updateCarActive,
+        isRented: updateIsRented,
+        carAvailableStock: updateCarAvailableStock,
+        gearBox: updateGearBox,
+        mileage: updateMileage,
+        dailyPrice: updateDailyPrice
+    };
+    console.log('carData:', carData);
+
+    /*  ->eğer backend de update isteğini @ModelAtribute ile yaparsan formData'ya append leri alttaki gibi tek tek at.new Blob kullanmamalısın!!!!
+        ->eğer backend de update isteği @RequestPart ise  şunu kullan:
+        const formData = new FormData();                                                                      //formData nesnesi oluştur
+        formData.append('file', feditedSelectedImage = updateProductImage.files[0]);                          //file'ı ilk dosya olarak otomatik ekleyecek.feditedSelectedImage değişkenine updateProductImage input elementinden alınan ilk dosyayı atıyorsunuz. Yani, feditedSelectedImage ve updateProductImage.files[0] aynı dosyayı referans eder.
+        formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));    //Blob nesnesi, veri (bu örnekte JSON) ile birlikte bir veri kümesi oluşturur. Blob ile veri göndermek, genellikle FormData içinde JSON verisi göndermek için kullanılır.  yani productData sını bir json veri kümesine dönüştürüp product nesnesinin içine ekleyecek
+
+    */
+    const formData = new FormData();
+    formData.append('file', updateCarImage.files[0]); // Dosya yüklemesi
+    formData.append('id', updateCarId);
+    formData.append('brandId', updateCarBrandId);
+    formData.append('modelName', updateModelName);
+    formData.append('color', updateColor);
+    formData.append('carStatus', updateCarStatus);
+    formData.append('active', updateCarActive);
+    formData.append('isRented', updateIsRented);
+    formData.append('carAvailableStock', updateCarAvailableStock);
+    formData.append('gearBox', updateGearBox);
+    formData.append('mileage', updateMileage);
+    formData.append('dailyPrice', updateDailyPrice);
+
+    fetch(BASE_PATH + "car/update", {
+        method: 'PUT',
+        body: formData,
+        headers: {
+            'Authorization': 'Bearer ' + jwtToken
+        }
+    }).then(response => {
+        if(!response.ok){
+            throw new Error("Car updating request failed status code : " , response.status)
+        }
+        getAllCar();
+        showSuccessAlert('Car updated successfully');
+        clearModalValues();
+        closeUpdateCarModal();
+    }).catch(error => {
+        console.error('Error : ', error);
+        showFailAlert('An error occurred while updating the car');
+    });
+}
+
+async function closeUpdateCarModal(){
+
+const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updateCarModal'))   
+modal.hide();
+}
+
+document.addEventListener("DOMContentLoaded", async ()=> {
+    await getAllCar();
+    await getBrands();
+
+
+ })

@@ -1,35 +1,26 @@
-body {
-    display: flex;
-    height: 100vh;
-    background-color: #f8f9fa;
-}
-.sidebar {
-    min-width: 250px;
-    background-color: #343a40;
-    color: white;
-}
-.sidebar a {
-    color: white;
-}
-.sidebar a:hover {
-    background-color: #495057;
-}
-.content {
-    flex-grow: 1;
-    padding: 20px;
-}
-.thead{
-    text-align: center;
-}
-table {
-    width: 100%; /* Tablo genişliği */
-    border-collapse: collapse; /* Kenarları birleştir */
-}
 
-td, th {
-    text-align: center; /* Yatay ortalama */
-    vertical-align: middle; /* Dikey ortalama */
-    padding: 10px; /* İç boşluk */
-    border: 1px solid #ddd; /* Kenar */
-    
+/* alertlerin Css */
+#success-alert,
+#fail-alert {                   
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    width: 300px;
+    padding: 15px;
 }
+#success-alert .close{
+    position: absolute;
+    top: 1px;
+    right: -15px;
+    z-index: 1040; 
+ /* alertin .close düğmesinin görünümünü kontrol etmek için  alert içindeki x işareti yazının altında kaldığı için ekledim*/
+ #fail-alert .close {
+    position: absolute;
+    top: 1px;
+    right: -15px;
+   /* Kapatma düğmesini uyarının üzerinde göstermek için */
+}
+}
+    

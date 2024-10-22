@@ -219,13 +219,17 @@ function displayBrands(brands){
             }, 50);
         }, 3000);
     }
+function showAddBrandModal() {
+    const addBrandModal = new bootstrap.Modal(document.getElementById('addBrandModal'));
+    addBrandModal.show();
+}
 
 
 document.addEventListener('DOMContentLoaded', async () => {
     await getAllBrand();
 
-    document.getElementById('addBrandBtn').addEventListener("click", function () { //addEventListener da onclick="addBrand()" sil ve butonın id 'sini ekle buraya
-        const brandName = document.getElementById('brandName').value; 
+    document.getElementById('addBrandButton').addEventListener("click", function () { //addEventListener da onclick="addBrand()" sil ve butonın id 'sini ekle buraya
+        const brandName = document.getElementById("brandName").value; 
 
         
          if (!brandName) {
@@ -238,11 +242,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + jwtToken
             },
-            body: JSON.stringify({ name: brandName })
-        })
-        .then(response => {
+            body: JSON.stringify({ 
+                name: brandName
+             })
+        }).then(response => {
             if (!response.ok) {
-                throw new Error("An error occurred while adding a brand.");
+                throw new Error("Brand create request failed code status", response.status)
             }
             return response.json();
         })
@@ -253,7 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
         .catch(error => {
             console.error("Error: ", error);
-            showFailAlert("Failed to add brand: " + error.message);
-        });
+           
+        })
     });
 });

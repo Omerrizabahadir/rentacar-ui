@@ -25,16 +25,18 @@
         console.log(data);
 
         displayBrands(data)
+
         }catch(error){
             console.error("Error fetching brands: ", error);
-            
+            if(error.status === 403){
             window.location.href = "login.html"
-        
+            }
         }
         }
 
         async function fetchCarByBrand(brandId){
-            const endPointUrl = BASE_PATH + "car/brand/" +brandId;
+            const endPointUrl = BASE_PATH + "car/brand/" + brandId;
+           
             try {
                 const response = await fetch(endPointUrl, {
                     method: 'GET',
@@ -46,6 +48,7 @@
                 if(!response.ok){
                     throw new Error("Failed to get cars by brand id, response.status : " + response.status)
                 }
+
                 const data = await response.json();
                 console.log(data);
 
@@ -53,7 +56,9 @@
                 
             }catch (error) {
                 console.error("Error fetching cars : ", error);
-                
+                if (error.status == 403) {
+                window.location.href = "login.html"
+            }
             }
         }
         
@@ -68,6 +73,7 @@
             brandSelect.appendChild(option);
         });
     }
+   
 
     function displayCars(cars){
         const carList = document.getElementById("carList");
@@ -77,14 +83,19 @@
             const carCard = document.createElement("div");
             carCard.classList.add("col-md-2", "mb-4");
 
+            const card =document.createElement("div");
+            card.classList.add("card");
+                
+
             const carImage = document.createElement("img");
             carImage.src = BASE_IMAGE_PATH + car.image
             carImage.alt = car.name;
+            carImage.classList.add("card-img-top");
             carImage.style.maxWidth = "175px";
             carImage.style.maxHeight = "175px";
 
             const cardBody = document.createElement("div");
-            cardBody.classList.add("card-body");
+            cardBody.classList.add("cart-body");
             cardBody.innerHTML = `
         <div class="card-body text-center">
             <h5 class="card-title fw-bold">${car.modelName}</h5> 
@@ -276,6 +287,7 @@
             await fetchCarByBrand(brandSelect.value);
         });
 
+    
         if (brandSelect.value) {
             await fetchCarByBrand(brandSelect.value);
         }
