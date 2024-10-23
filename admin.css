@@ -1,5 +1,4 @@
-
-/* alertlerin Css */
+alertlerin Css */
 #success-alert,
 #fail-alert {                   
     display: none;
@@ -20,7 +19,6 @@
     position: absolute;
     top: 1px;
     right: -15px;
-   /* Kapatma düğmesini uyarının üzerinde göstermek için */
+    z-index: 1040; /* Kapatma düğmesini uyarının üzerinde göstermek için */
 }
 }
-    

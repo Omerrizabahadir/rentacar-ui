@@ -20,7 +20,8 @@ async function addCar(){
     const mileage = document.getElementById('mileage').value;
 
     const formData = new FormData();
-    console.log("formData", formData)
+    console.log([...formData]); 
+
 
     formData.append("file", fileInput.files[0]); 
     formData.append("brandId", carBrandId); 
@@ -161,6 +162,7 @@ async function getBrands() {
 });
 }   
 
+//success alert 'i
 function showSuccessAlert(message) {
     let alert = document.getElementById('success-alert');
     alert.style.display = 'block';
@@ -168,21 +170,20 @@ function showSuccessAlert(message) {
 
     let alertMessage = document.getElementById('successAlertMessage');
     alertMessage.textContent = message;
-
-    setTimeout(() => {
+    setTimeout(() => {                         
         let opacity = 1;
         let timer = setInterval(() => {
             if (opacity <= 0.1) {
                 clearInterval(timer);
                 alert.style.display = 'none';
-            } else {
-                opacity -= 0.1;
-                alert.style.opacity = opacity;
             }
+            alert.style.opacity = opacity;
+            opacity -=  0.1;
         }, 50);
-    }, 3000); 
+    }, 3000);
 }
 
+//failed alert'i
 function showFailAlert(message) {
     let alert = document.getElementById('fail-alert');
     alert.style.display = 'block';
@@ -190,19 +191,17 @@ function showFailAlert(message) {
 
     let alertMessage = document.getElementById('failAlertMessage');
     alertMessage.textContent = message;
-
     setTimeout(() => {
         let opacity = 1;
         let timer = setInterval(() => {
             if (opacity <= 0.1) {
                 clearInterval(timer);
                 alert.style.display = 'none';
-            } else {
-                opacity -= 0.1;
-                alert.style.opacity = opacity;
             }
+            alert.style.opacity = opacity;
+            opacity -=  0.1;
         }, 50);
-    }, 3000); 
+    }, 3000);
 }
 
 function showDeleteCarModal(carId) {
