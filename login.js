@@ -26,6 +26,7 @@ function submitForm(){
         localStorage.setItem("customerId", data.customerId)
 
         const role = parseJwt(data.token)
+        showSuccessAlert("User login successfully!");
 
         if(role === "ROLE_ADMIN"){
             window.location.href = "admin.html"
@@ -33,8 +34,49 @@ function submitForm(){
             window.location.href = "index.html"
         }
     }).catch(error => {
-        alert(error.message)
+        showFailAlert("Login failed: " + error.message);
     })
+}
+ //success alert 'i
+ function showSuccessAlert(message) {
+    let alert = document.getElementById('success-alert');
+    alert.style.display = 'block';
+    alert.style.opacity = 2;
+
+    let alertMessage = document.getElementById('successAlertMessage');
+    alertMessage.textContent = message;
+    setTimeout(() => {                         
+        let opacity = 2;
+        let timer = setInterval(() => {
+            if (opacity <= 0.1) {
+                clearInterval(timer);
+                alert.style.display = 'none';
+            }
+            alert.style.opacity = opacity;
+            opacity -= 0.1;
+        }, 50);
+    }, 3000);
+}
+
+//failed alert'i
+function showFailAlert(message) {
+    let alert = document.getElementById('fail-alert');
+    alert.style.display = 'block';
+    alert.style.opacity = 1;
+
+    let alertMessage = document.getElementById('failAlertMessage');
+    alertMessage.textContent = message;
+    setTimeout(() => {
+        let opacity = 1;
+        let timer = setInterval(() => {
+            if (opacity <= 0.1) {
+                clearInterval(timer);
+                alert.style.display = 'none';
+            }
+            alert.style.opacity = opacity;
+            opacity -= 0.1;
+        }, 50);
+    }, 3000);
 }
 
 function parseJwt(token) {
