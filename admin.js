@@ -19,6 +19,18 @@ async function addCar(){
     const isRented = document.getElementById('isRented').checked;
     const mileage = document.getElementById('mileage').value;
 
+
+     // Boş alan kontrolü
+     if (!carBrandId || !modelName || !dailyPrice || !carAvailableStock) {
+        alert('Lütfen tüm gerekli alanları doldurun!');
+        return;
+    }
+
+    if (fileInput.files.length === 0) {
+        alert('Lütfen bir resim yükleyin!');
+        return;
+    }
+
     const formData = new FormData();
     console.log([...formData]); 
 
@@ -49,7 +61,7 @@ async function addCar(){
         dailyPrice: dailyPrice
 
     };
-   
+   /*
     await fetch(BASE_PATH + "car/create", {
         method: 'POST',
         headers: {
@@ -74,7 +86,31 @@ async function addCar(){
         showFailAlert('Car add is unsuccessfull ');
     });
 }
+*/
+try {
+    const response = await fetch(BASE_PATH + "car/create", {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + jwtToken
+        },
+        body: formData
+    });
 
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error("Car add request failed: " + errorText);
+    }
+
+    const data = await response.json();
+    hideCarModal('addCarModal');
+    clearModalValues();
+    showSuccessAlert('Car added successfully');
+    getAllCar();
+} catch (error) {
+    console.error('Error:', error);
+    showFailAlert('Car add is unsuccessfull.');
+}
+}
 async function getAllCar() {
     try{
         const response = await fetch(BASE_PATH + "car/all", {
@@ -203,13 +239,13 @@ function showFailAlert(message) {
         }, 50);
     }, 3000);
 }
-
+/*
 function showDeleteCarModal(carId) {
     currentCarId=carId;
     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("confirmDeleteModal"));
     modal.show();
 }
-
+*/
 function hideCarModal(modalId){
     
     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById(modalId))
@@ -458,9 +494,30 @@ const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('updat
 modal.hide();
 }
 
-document.addEventListener("DOMContentLoaded", async ()=> {
-    await getAllCar();
-    await getBrands();
+document.addEventListener("DOMContentLoaded", async () => {
+    // Başlangıçta alertleri gizlemek için
+    const successAlert = document.getElementById('success-alert');
+    const failAlert = document.getElementById('fail-alert');
 
+    successAlert.style.opacity = 0;
+    failAlert.style.opacity = 0;
 
- })
+    // Kapatma butonlarına event listener ekleme
+    const closeSuccessAlert = document.querySelector('#success-alert .close');
+    closeSuccessAlert.addEventListener('click', function() {
+        successAlert.style.opacity = 0; // Gizlemek için opacity'yi sıfır yap
+    });
+
+    const closeFailAlert = document.querySelector('#fail-alert .close');
+    closeFailAlert.addEventListener('click', function() {
+        failAlert.style.opacity = 0; // Gizlemek için opacity'yi sıfır yap
+    });
+
+    try {
+        await getAllCar();
+        await getBrands();
+        showSuccessAlert("Araçlar ve markalar başarıyla yüklendi!");
+    } catch (error) {
+        showFailAlert("Araçlar ve markalar yüklenirken bir hata oluştu.");
+    }
+});
