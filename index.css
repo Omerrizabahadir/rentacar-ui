@@ -1,4 +1,5 @@
-#modal {
+.modal {
+    display: none; /* Gizli olarak başlar */
     position: fixed;
     z-index: 1;
     left: 0;
@@ -11,15 +12,9 @@
 }
 
 .modal-content {
-    background-color: #dce1f7;
-    top: -10%; 
-    left: 50%;
-    transform: translateX(-55%);
-    position: absolute;
+    background-color: #fefefe;
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px; 
 }
