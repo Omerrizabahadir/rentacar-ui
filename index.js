@@ -136,10 +136,17 @@
     
         if (car.carAvailableStock > 0 && carCountInRent < car.carAvailableStock) {
             rentItems.push(car);
+            console.log("Car added to rentals:", car);
+
+            updateRentalButtonVisibility();
+
+            if (rentItems.length > 0) {
+                rentNow();
+            }
+
             myRentals.push(car);
             console.log("Car added to rentals:", car);
             updateRent();
-            updateRentalButtonVisibility();
             
             confirmRental(car);
         } else if (car.carAvailableStock === 0) {
@@ -148,10 +155,13 @@
             showModal("There are " + (car.carAvailableStock - carCountInRent) + " car left in stock.");
         }
     }
+        
+
     function showModal(message= ""){
         const modal = document.getElementById("modal");
         const modalMessage = document.getElementById("modalMessage");
         
+    
         if (message) {
             modalMessage.textContent = message; // Mesaj varsa modal açılır
             modal.style.display = "block";
@@ -225,7 +235,7 @@ function closeAddressModal() {
         const idCountMap = new Map();
         rentItems.forEach(item => {
             const { id } = item;
-    
+            
             //Check if the id exists in the map
             if (idCountMap.has(id)) {
                 //if it exists, increment the count
@@ -234,7 +244,9 @@ function closeAddressModal() {
                 //if it doesn't exist, add it to the map
                 idCountMap.set(id, 1);
             }
-        })
+        });
+        updateRentalButtonVisibility();
+    
     
         idCountMap.forEach((count, id) => {
             console.log("id : ", id, " count : ", count)
@@ -306,6 +318,7 @@ function closeAddressModal() {
             
         });
         const dailyPrice = car.dailyPrice;
+
         document.getElementById("calculatePriceButton").onclick = function() {
             calculateModalPrice(dailyPrice);
 
@@ -316,8 +329,13 @@ function closeAddressModal() {
         document.getElementById("confirmRentalButton").onclick = function() {
             submitRental(car);
         };
-    }
-    
+         // Dışarı tıklama ile modalı kapatma olayı
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+        }
+    };
+}
     
     function rentNow() {
         console.log("Selected Rent Items: ", rentItems);
@@ -511,6 +529,9 @@ function updateMyRentals() {
     function closeModal() {
         const modal = document.getElementById("rentalModal");
         modal.style.display = "none"; // Modalı kapat
+
+        // Olay dinleyicisini kaldır
+    window.onclick = null;
     }
 
     function updateEndDate() {
@@ -635,3 +656,7 @@ function updateEndDate(selectedDate) {
     document.getElementById("endRentalDate").value = startDate.toISOString().split("T")[0];
 }
     
+/*todo
+rentnow butonu görünmüyor bak!!!
+car sekmesi için arabalar sayfası yap
+*/
