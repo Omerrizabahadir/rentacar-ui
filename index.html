@@ -1,3 +1,5 @@
+Index.html
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,13 +8,12 @@
         <title>AutoRent</title>
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-        <link rel = "stylesheet" href = "index.css">
-      </head>
+        <link rel="stylesheet" href="index.css">
+    </head>
        
     <body>
-        <!--Navbar-->
+        <!-- Navbar -->
         <nav class="navbar navbar-dark bg-dark fixed-top">
             <div class="container-fluid">
               <a class="navbar-brand" href="#">AutoRent</a>
@@ -33,12 +34,10 @@
                       <a class="nav-link" href="car.html">Car</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="customerRental.html">Rental</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="login.html">Logout</a>
-                      </li>
-                      </ul>
+                      <a class="nav-link" href="customerRental.html">Rental</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="login.html">Logout</a>
                     </li>
                   </ul>
                   <form class="d-flex mt-3" role="search">
@@ -54,7 +53,8 @@
     <div class="col-md-4">
         <h2>Brands</h2>
         <select id="brandSelect" class="form-select" aria-label="Select Brand">
-            <!-- Brands will be pulled from the backend and added dynamically here -->
+          
+          <!-- Brands will be pulled from the backend and added dynamically here -->
         </select>
     </div>
 
@@ -70,66 +70,75 @@
 
     <!-- Rental content -->
    <div class="col-md-4">
-    <h2>My Rentals<span id="rentalCount" class="badge bg-info ms-3 flex justify-content-end align-items-right">+ 0</span></h2>
+    <h2>My Rentals<span id="rentalCount" class="badge bg-info ms-3">+ 0</span></h2>
    
     <ul id="myRentalsList" class="list-group">
-        <!-- It will be added dynamically when the Add to Cart button is clicked.-->
+        <!-- It will be added dynamically when the "Add to Cart" button is clicked. -->
     </ul>
+
+     <!-- Kiralanan araçların listesi için yeni bir <ul> öğesi ekleyin -->
+      <h3>Rent List</h3>
+      <ul id="rent" class="list-group">
+          <!-- Kiralanan araçlar burada dinamik olarak listelenecek -->
+      </ul>
+  
     
-    <p id="overallTotalPriceDisplay" class="fw-bold mt-3">Tüm Araçların Toplam Fiyatı: 0 TL</p> <!-- Tüm araçların toplam fiyatı -->
+    <p id="overallTotalPriceDisplay" class="fw-bold mt-3">Total Price of All Cars: 0</p>
     <button id="rentalButton" class="btn btn-primary mt-3" style="display: none;" onclick="rentNow()">Rent Now!</button>
 </div>
 
-    
-
-  <!--Modal for rent-->
-    <div id="modal" style="display:none;">
+  <!-- Modal for rent -->
+  <div id="modal" style="display:none;">
       <div class="modal-content">
           <span id="modalClose" style="cursor:pointer;">&times;</span>
           <p id="modalMessage"></p>
       </div>
   </div>
 
- <!-- Modal for rent -->
-<!-- Modal for rent -->
-<div id="rentalModal" class="modal">
-  <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2>Araba Kirala</h2>
-      
-      <div id="modalCarInfo"></div> <!-- Araç bilgileri burada gösterilecek -->
-      <div>
-          <label for="rentalQuantity">Miktar:</label>
-          <input type="number" id="rentalQuantity" min="1" />
-      </div>
-      <div>
-          <label for="pickupAddress">Alış Adresi:</label>
-          <input type="text" id="pickupAddress" placeholder="Alış adresini girin" />
-      </div>
-      <div>
-          <label for="returnAddress">Teslim Adresi:</label>
-          <input type="text" id="returnAddress" placeholder="Teslim adresini girin" />
-      </div>
-      <div>
-          <label for="startRentalDate">Başlangıç Tarihi:</label>
-          <input type="text" id="startRentalDate" />
-      </div>
-      <div>
-          <label for="endRentalDate">Bitiş Tarihi:</label>
-          <input type="text" id="endRentalDate" />
-      </div>
-      <button id="calculatePriceButton" class="btn btn-secondary mt-2">Fiyatı Hesapla</button>
-      <div id="modalTotalPriceDisplay" class="mt-2 fw-bold">Toplam Fiyat: 0 TL</div> <!-- Toplam fiyat burada gösterilecek -->
-      <button id="confirmRentalButton" class="btn btn-success mt-2">Kiralama Onayla</button>
+  <!-- Modal for rent -->
+  <div id="rentalModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Rent a Car</h2>
+        
+        <div id="modalCarInfo"></div> <!-- Car details will be displayed here -->
+        <div>
+            <label for="rentalQuantity">Quantity:</label>
+            <input type="number" id="rentalQuantity" min="1" />
+        </div>
+        <div>
+            <label for="pickupAddress">Pickup Address:</label>
+            <input type="text" id="pickupAddress" placeholder="Enter pickup address" />
+        </div>
+        <div>
+            <label for="returnAddress">Return Address:</label>
+            <input type="text" id="returnAddress" placeholder="Enter return address" />
+        </div>
+        <div>
+            <label for="startRentalDate">Start Date:</label>
+            <input type="text" id="startRentalDate" />
+        </div>
+        <div>
+            <label for="endRentalDate">End Date:</label>
+            <input type="text" id="endRentalDate" />
+        </div>
+        <button id="calculatePriceButton" class="btn btn-secondary mt-2">Calculate Price</button>
+        <div id="modalTotalPriceDisplay" class="mt-2 fw-bold">Total Price: 0</div>
+        <button id="confirmRentalButton" class="btn btn-success mt-2">Confirm Rental</button>
+    </div>
   </div>
+  <div id="rentalDetails" class="mt-3">
+    <!-- Kiralama detayları burada gösterilecek -->
 </div>
 
 
-         <!-- Bootstrap JS ve Popper.js -->
+         <!-- Bootstrap JS and jQuery -->
          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-         <script src="index.js" ></script>
+        <!-- jQuery'yi dahil ettiğinizden emin olun -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- jQuery UI (veya Bootstrap için ilgili JS dosyası) -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        <script src="index.js" ></script>
     </body>
 </html>
-  
+

@@ -1,12 +1,14 @@
-    const jwtToken = localStorage.getItem("jwtToken");
+
+ const jwtToken = localStorage.getItem("jwtToken");
     const customerId = localStorage.getItem("customerId");
 
     const BASE_PATH = "http://localhost:8080/"
     const BASE_IMAGE_PATH = "/Users/macbook/Documents/GitHub/rentacar/"
 
     let rentItems = [];
-
+   
     async function fetchBrands(){
+        console.log("fetchBrands fonksiyonu çalıştı.");
             console.log(jwtToken);
         try{
         const response = await fetch(BASE_PATH + "brand", {
@@ -24,7 +26,8 @@
         const data = await response.json();
         console.log(data);
 
-        displayBrands(data)
+       displayBrands(data)
+       
 
         }catch(error){
             console.error("Error fetching brands: ", error);
@@ -37,8 +40,6 @@
             return rentedCars.some(car => car.id === carId); // Kiralanmış araçlar arasında kontrol etme
         }
         
-        
-
         async function fetchCarByBrand(brandId){
             const endPointUrl = BASE_PATH + "car/brand/" + brandId;
            
@@ -61,7 +62,6 @@
                     // Her bir araç için isRented durumunu kontrol etme
                     car.isRented = checkIfCarIsRented(car.id);
                 });
-        
 
                 displayCars(data);
                 
@@ -72,62 +72,81 @@
             }
             }
         }
-        
-    function displayBrands(brands){
-        const brandSelect = document.getElementById("brandSelect");
-        brandSelect.innerHTML = '';
-
-        brands.forEach(brand => {
-            const option = document.createElement("option");
-            option.value = brand.id;
-            option.text = brand.name;
-            brandSelect.appendChild(option);
-        });
-    }
-   
-    function displayCars(cars){
-        const carList = document.getElementById("carList");
-        carList.innerHTML = '';
-        cars.forEach( car => {
-            
-            const carCard = document.createElement("div");
-            carCard.classList.add("col-md-2", "mb-4");
-
-            const card =document.createElement("div");
-            card.classList.add("card");
+        function displayBrands(brands){
+            const brandSelect = document.getElementById("brandSelect");
+            brandSelect.innerHTML = '';
+            brandSelect.appendChild(new Option("Bir Marka Seçin", ""));
+    
+            brands.forEach(brand => {
+                const option = document.createElement("option");
+                option.value = brand.id;
+                option.text = brand.name;
+                brandSelect.appendChild(option);
+            });
+        }
+        function displayCars(cars){
+            const carList = document.getElementById("carList");
+            carList.innerHTML = '';
+            cars.forEach( car => {
                 
+                const carCard = document.createElement("div");
+                carCard.classList.add("col-md-2", "mb-4");
+    
+                const card =document.createElement("div");
+                card.classList.add("card");
+                    
+    
+                const carImage = document.createElement("img");
+                carImage.src = BASE_IMAGE_PATH + car.image
+                carImage.alt = car.name;
+                carImage.classList.add("card-img-top");
+                carImage.style.maxWidth = "175px";
+                carImage.style.maxHeight = "175px";
+    
+                const cardBody = document.createElement("div");
+                cardBody.classList.add("cart-body");
+                cardBody.innerHTML = `
+            <div class="card-body text-center">
+                <h5 class="card-title fw-bold">${car.modelName}</h5> 
+                <p class="card-text text-muted">${car.gearBox}</p> 
+                <p class="card-text fw-bold fs-5">${car.dailyPrice} TL</p> 
+                <p class="card-text"><small class="text-secondary">${car.carStatus}</small></p> 
+                <button class="btn btn-success mt-3" onclick='openRentalModal(${JSON.stringify(car)})'>Add To Rental</button> 
+            </div>
+        `;
+    
+                carCard.appendChild(carImage);
+                carCard.appendChild(cardBody);
+                
+                carList.appendChild(carCard);
+    
+            });
+        }
 
-            const carImage = document.createElement("img");
-            carImage.src = BASE_IMAGE_PATH + car.image
-            carImage.alt = car.name;
-            carImage.classList.add("card-img-top");
-            carImage.style.maxWidth = "175px";
-            carImage.style.maxHeight = "175px";
-
-            const cardBody = document.createElement("div");
-            cardBody.classList.add("cart-body");
-            cardBody.innerHTML = `
-        <div class="card-body text-center">
-            <h5 class="card-title fw-bold">${car.modelName}</h5> 
-            <p class="card-text text-muted">${car.gearBox}</p> 
-            <p class="card-text fw-bold fs-5">${car.dailyPrice} TL</p> 
-            <p class="card-text"><small class="text-secondary">${car.carStatus}</small></p> 
-            <button class="btn btn-success mt-3" onclick='openRentalModal(${JSON.stringify(car)})'>Add To Rental</button> 
-        </div>
-    `;
-
-            carCard.appendChild(carImage);
-            carCard.appendChild(cardBody);
-            
-            carList.appendChild(carCard);
-
-        });
-    }
-
+        async function fetchRentedCars() {
+            try {
+                const response = await fetch(`${BASE_PATH}rental/customer/${customerId}`, { // Aktif kiralamaları getir
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + jwtToken
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch rented cars, response status: " + response.status);
+                }
+                
+                rentedCars = await response.json(); // Kiralanmış araçları güncelle
+            } catch (error) {
+                console.error("Error fetching rented cars: ", error);
+            }
+        }
+    
     function addToRent(car){
          // Araç kiralanabilirlik kontrolü
     if (car.isRented) {
-        showModal("Seçtiğiniz araba başkası tarafından kiralanmıştır.");
+        showModal("The car you selected is already rented.");
         return;
     }
 
@@ -135,20 +154,37 @@
         console.log("carCountInRent : "+ carCountInRent);
     
         if (car.carAvailableStock > 0 && carCountInRent < car.carAvailableStock) {
+            
+             // Modal'dan kiralama bilgilerini al
+        const quantity = document.getElementById("rentalQuantity").value; // Miktarı al
+        const dailyPrice = car.dailyPrice; // Günlük fiyatı al
+        const totalPrice = dailyPrice * quantity; // Toplam fiyatı hesapla
+
+        // Kiralama detayları ile birlikte aracı myRentals'a ekle
+        myRentals.push({
+            modelName: car.modelName, // Model adı
+            brandName: car.brandName, // Marka adı (varsa)
+            quantity: quantity,
+            dailyPrice: dailyPrice,
+            totalPrice: totalPrice // Toplam fiyatı kaydet
+        });
+
+            
             rentItems.push(car);
-            console.log("Car added to rentals:", car);
+            console.log("Current rentItems:", rentItems);
+
 
             updateRentalButtonVisibility();
-
+            confirmRental(car);
             if (rentItems.length > 0) {
-                rentNow();
+               
             }
 
             myRentals.push(car);
             console.log("Car added to rentals:", car);
             updateRent();
             
-            confirmRental(car);
+           
         } else if (car.carAvailableStock === 0) {
             showModal("This car is out of stock. Please choose another car.");
         } else {
@@ -183,6 +219,12 @@ function closeAddressModal() {
     function updateRent(){
         console.log("Rent Items : ", rentItems);
         const rent = document.getElementById("rent");
+
+        if (!rent) {
+            console.error("Rent element not found!");
+            return; // Eğer rent elementi yoksa fonksiyondan çık
+        }
+
         rent.innerHTML = '';
 
         rentItems.forEach((item, index) => {
@@ -216,189 +258,26 @@ function closeAddressModal() {
 
     function updateRentalButtonVisibility(){
         const rentalButton = document.getElementById("rentalButton");
-        console.log("Checking rental button...", rentalButton); 
+        console.log("Rental Button Display Style:", rentalButton ? rentalButton.style.display : "Button not found");
         if (!rentalButton) {
             console.error("Rental button not found!");
             return; 
         }
+         // Butonun durumunu konsola yazdır
+    console.log("Rental Button Before Update:", rentalButton);
+    console.log("Button Display Style Before Update:", rentalButton.style.display);
+    
         
         if (rentItems.length > 0) {
+            console.log("updateRentalButtonVisibility çağrıldı.");
+            console.log("Rent Items Length:", rentItems.length);
+
             rentalButton.style.display = "block";
         } else {
             rentalButton.style.display = "none";
         }
     }
-
-    function rentNow() {
-        console.log("rentNow : ", rentItems)
-    
-        const idCountMap = new Map();
-        rentItems.forEach(item => {
-            const { id } = item;
-            
-            //Check if the id exists in the map
-            if (idCountMap.has(id)) {
-                //if it exists, increment the count
-                idCountMap.set(id, idCountMap.get(id) + 1);
-            } else {
-                //if it doesn't exist, add it to the map
-                idCountMap.set(id, 1);
-            }
-        });
-        updateRentalButtonVisibility();
-    
-    
-        idCountMap.forEach((count, id) => {
-            console.log("id : ", id, " count : ", count)
-        });
-    
-        var rentalCarInfoList = [...idCountMap].map(([carId, quantity, startRentalDate, endRentalDate, rentalPeriod, pickupAddress, returnAddress]) => ({ 
-            carId, 
-            quantity, 
-            startRentalDate,
-            endRentalDate,
-            rentalPeriod,
-            pickupAddress,
-            returnAddress
-         }));
-        console.log("rentalCarInfoList : ", rentalCarInfoList)
-    
-        fetch(BASE_PATH + "rental", {
-            method: 'POST',
-            body: JSON.stringify({
-                customerId,
-                rentalList: rentalCarInfoList
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + jwtToken
-            }
-        }).then(response => {
-            if (!response.ok) {
-                console.error("Rental request failed: ", response);
-                throw new Error("Rental request failed code status : " + response.status);
-            }
-            return response.json();
-        }).then(data => {
-            console.log(data);
-            clearRent();
-        }).catch(error => {
-            console.error("Error in rentNow function: ", error);
-        });
-    }   
-      
-    function confirmRental(car) {
-        // Modalı aç
-        openRentalModal(car);
-    }
-    
-    let rentalInfos = [];
-    function openRentalModal(car) {
-        console.log("Selected Car: ", car); 
-
-        const modal = document.getElementById("rentalModal");
-        const modalCarInfo = document.getElementById("modalCarInfo");
-        
-       // Araç bilgilerini modalda göster
-    modalCarInfo.innerText = `Araç: ${car.brandId || 'Bilinmiyor'} ${car.modelName}, Günlük Fiyat: ${car.dailyPrice} TL`;
-
-     // Quantity alanını temizle
-     document.getElementById("rentalQuantity").value = '';
-
-    modal.style.display = "block";
-    
-        // Tarih seçicileri başlat
-        $("#startRentalDate").datepicker({
-            dateFormat: "dd-mm-yy",
-            
-        });
-        
-        $("#endRentalDate").datepicker({
-            dateFormat: "dd-mm-yy",
-            
-        });
-        const dailyPrice = car.dailyPrice;
-
-        document.getElementById("calculatePriceButton").onclick = function() {
-            calculateModalPrice(dailyPrice);
-
-        document.getElementById("calculatePriceButton").onclick = function() {
-            calculateTotalPrice(car.dailyPrice);
-        };
-    
-        document.getElementById("confirmRentalButton").onclick = function() {
-            submitRental(car);
-        };
-         // Dışarı tıklama ile modalı kapatma olayı
-        window.onclick = function(event) {
-            if (event.target === modal) {
-                closeModal();
-        }
-    };
-}
-    
-    function rentNow() {
-        console.log("Selected Rent Items: ", rentItems);
-        // İlk aracı al (veya modalda birden fazla araç gösterilecekse uygun şekilde ayarlama)
-        const car = rentItems[0];
-        openRentalModal(car);
-    }
-    document.getElementById("modalClose").onclick = function() {
-        closeModal();
-    };
-    
-    function updateRentalPeriod() {
-        const startDateInput = document.getElementById('startRentalDate').value;
-        const endDateInput = document.getElementById('endRentalDate').value;
-    
-        if (startDateInput && endDateInput) {
-            const rentalDays = calculateRentalDays(startDateInput, endDateInput);
-            document.getElementById('rentalPeriodDisplay').innerText = rentalDays;
-        } else {
-            document.getElementById('rentalPeriodDisplay').innerText = 0;
-        }
-    }
-    // Fiyat hesaplama fonksiyonu
-    function calculateTotalPrice(dailyPrice) {
-        const quantity = document.getElementById("rentalQuantity").value || 0;
-        const startDate = $("#startRentalDate").val();
-        const endDate = $("#endRentalDate").val();
-    
-        // Tarihleri kontrol et ve toplam fiyatı hesapla
-        if (startDate && endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const rentalDays = (end - start) / (1000 * 60 * 60 * 24); // Gün sayısını hesapla
-            const totalPrice = rentalDays * dailyPrice * quantity;
-            
-            
-            const totalPriceDisplay = document.getElementById("totalPriceDisplay");
-            
-        } else {
-            alert("Lütfen başlangıç ve bitiş tarihlerini girin.");
-        }
-    }
-    function calculateModalPrice() {
-        const quantity = document.getElementById("rentalQuantity").value || 0;
-        const startDate = $("#startRentalDate").val();
-        const endDate = $("#endRentalDate").val();
-    
-        if (startDate && endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const rentalDays = (end - start) / (1000 * 60 * 60 * 24); // Gün sayısını hesapla
-            const totalPrice = rentalDays * dailyPrice * quantity;
-    
-            // Modalda fiyatı göster
-            const totalPriceDisplay = document.getElementById("modalTotalPriceDisplay");
-            totalPriceDisplay.innerText = `Toplam Fiyat: ${totalPrice} TL`;
-        } else {
-            alert("Lütfen başlangıç ve bitiş tarihlerini girin.");
-        }
-    }
-}
-
-let myRentals = [];
+    let myRentals = [];
 function submitRental(car) {
     const rentalQuantity = parseInt(document.getElementById("rentalQuantity")?.value);
     const startRentalDate = document.getElementById("startRentalDate")?.value;
@@ -483,7 +362,100 @@ fetch(BASE_PATH + "rental", {
     closeModal();
 });
 }
+   
+// Kullanıcının ismini alacak bir örnek fonksiyon
+function getCurrentUserName() {
+    // Burada kullanıcı bilgilerini almak için gerekli kodu yazabilirsiniz
+    // Örnek olarak sabit bir değer döndürebiliriz
+    return "Kullanıcı Adı"; // Gerçek kullanıcı adını buradan alabilirsiniz
+}
+     
+    function confirmRental(car) {
+        // Modalı aç
+        openRentalModal(car);
+    }
+    
+    let rentalInfos = [];
+    function openRentalModal(car) {
+        console.log("Selected Car: ", car); 
 
+        const modal = document.getElementById("rentalModal");
+        const modalCarInfo = document.getElementById("modalCarInfo");
+        
+       // Araç bilgilerini modalda göster
+    modalCarInfo.innerText = `Araç: ${car.brandId || 'Bilinmiyor'} ${car.modelName}, Günlük Fiyat: ${car.dailyPrice} TL`;
+
+     // Quantity alanını temizle
+     document.getElementById("rentalQuantity").value = '';
+
+    modal.style.display = "block";
+    
+        // Tarih seçicileri başlat
+        $("#startRentalDate").datepicker({
+            dateFormat: "dd-mm-yy",
+            changeMonth: true,
+            changeYear: true,
+            showAnim: "slideDown",
+            minDate: 0,
+            onSelect: function(selectedDate) {
+                // Bitiş tarihi için minimum tarihi başlangıç tarihi olarak ayarla
+                $("#endRentalDate").datepicker("option", "minDate", selectedDate);
+            }
+            
+        });
+        
+        $("#endRentalDate").datepicker({
+            dateFormat: "dd-mm-yy",
+            changeMonth: true,
+            changeYear: true,
+            showAnim: "slideDown",
+            minDate: 0 
+            
+        });
+        const dailyPrice = car.dailyPrice;
+
+        document.getElementById("calculatePriceButton").onclick = function() {
+            calculateModalPrice(dailyPrice);
+
+        
+        document.getElementById("confirmRentalButton").onclick = function() {
+            const quantity = document.getElementById("rentalQuantity").value;
+            if (quantity > 0) {
+                // Modal kapandıktan sonra aracı ekleyin
+                car.quantity = quantity; // Aracın miktarını ayarla
+               rentNow(car);
+                closeModal(); // Modali kapat
+            } else {
+                alert("Lütfen geçerli bir miktar girin.");
+            }
+        };
+         // Dışarı tıklama ile modalı kapatma olayı
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+        }
+    };
+}
+    
+    function calculateModalPrice() {
+        const quantity = document.getElementById("rentalQuantity").value || 0;
+        const startDate = $("#startRentalDate").val();
+        const endDate = $("#endRentalDate").val();
+    
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const rentalDays = (end - start) / (1000 * 60 * 60 * 24); // Gün sayısını hesapla
+            const totalPrice = rentalDays * dailyPrice * quantity;
+    
+            // Modalda fiyatı göster
+            const totalPriceDisplay = document.getElementById("modalTotalPriceDisplay");
+            totalPriceDisplay.innerText = `Toplam Fiyat: ${totalPrice} TL`;
+        } else {
+            alert("Lütfen başlangıç ve bitiş tarihlerini girin.");
+        }
+    }
+}
 
 
 // Araç ID'sine göre aracı bulmak için bir yardımcı fonksiyon
@@ -491,8 +463,29 @@ function getCarById(carId) {
     //  araçları içeren bir dizi
     return cars.find(car => car.id === carId);
 }
+// Fiyat hesaplama fonksiyonu
+function calculateTotalPrice(dailyPrice) {
+    const quantity = document.getElementById("rentalQuantity").value || 0;
+    const startDate = $("#startRentalDate").val();
+    const endDate = $("#endRentalDate").val();
 
-    
+    // Tarihleri kontrol et ve toplam fiyatı hesapla
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const rentalDays = (end - start) / (1000 * 60 * 60 * 24); // Gün sayısını hesapla
+        const totalPrice = rentalDays * dailyPrice * quantity;
+        
+        
+        const totalPriceDisplay = document.getElementById("totalPriceDisplay");
+        
+    } else {
+        alert("Lütfen başlangıç ve bitiş tarihlerini girin.");
+    }
+}
+
+
+
 function updateMyRentals() {
     const myRentalsList = document.getElementById("myRentalsList");
     const rentalCount = document.getElementById("rentalCount");
@@ -556,8 +549,104 @@ function updateMyRentals() {
         const dayDifference = Math.ceil(timeDifference / (1000 * 3600 * 24)); // Gün sayısını hesapla
         return dayDifference >= 0 ? dayDifference : 0; // Eğer negatifse sıfır döndür
     }
+    function updateRentalPeriod() {
+        const startDateInput = document.getElementById('startRentalDate').value;
+        const endDateInput = document.getElementById('endRentalDate').value;
     
+        if (startDateInput && endDateInput) {
+            const rentalDays = calculateRentalDays(startDateInput, endDateInput);
+            document.getElementById('rentalPeriodDisplay').innerText = rentalDays;
+        } else {
+            document.getElementById('rentalPeriodDisplay').innerText = 0;
+        }
+    }
+
+        function rentNow(car) {
+            const rentalQuantity = parseInt(document.getElementById("rentalQuantity").value);
+            const startRentalDate = document.getElementById("startRentalDate").value;
+            const endRentalDate = document.getElementById("endRentalDate").value;
+            const pickupAddress = document.getElementById("pickupAddress").value;
+            const returnAddress = document.getElementById("returnAddress").value;
+        
+            // Girişlerin kontrolü
+            if (!startRentalDate || !endRentalDate || !pickupAddress || !returnAddress) {
+                alert("Lütfen tüm alanları doldurun.");
+                return;
+            }
+        
+            const rentalDays = calculateRentalDays(startRentalDate, endRentalDate);
+        
+            if (rentalDays <= 0) {
+                alert("Please select a valid rental period.");
+                return;
+            }
+        
+            const rentalInfo = {
+                carId: car.id,
+                dailyPrice: car.dailyPrice,
+                quantity: rentalQuantity,
+                startRentalDate: new Date(startRentalDate).toISOString(), // ISO formatında
+                endRentalDate: new Date(endRentalDate).toISOString(),
+                rentalPeriod: rentalDays,
+                pickupAddress: pickupAddress,
+                returnAddress: returnAddress
+            };
+            console.log("Rental Info:", rentalInfo); 
+            console.log("customerId : ", customerId)
+           
+            const requestBody = {
+                customerId: (customerId.toString()), 
+                rentalList: [rentalInfo]
+            };
+        
+            
+            fetch(BASE_PATH + "rental", {
     
+                method: 'POST',
+                body: JSON.stringify(requestBody),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + jwtToken
+                },
+                body: JSON.stringify(requestBody)
+                
+            }).then(response => {
+
+                console.log("response :",response)
+                if(!response.ok){
+                    throw new Error("Rental request failed: " + response.message);
+                }
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                myRentals.push(rentalInfo);
+                updateMyRentals();
+                closeModal();
+            }).catch(error => {
+                console.error("Error in rentNow function: ", error);
+                closeModal();
+            });
+        }
+        
+        // Kiralama detaylarını gösteren fonksiyon
+function displayRentalDetails(rentalCarInfoList) {
+    const rentalDetailsDiv = document.getElementById("rentalDetails");
+    rentalDetailsDiv.innerHTML = ''; 
+    rentalCarInfoList.forEach(item => {
+        const rentalInfo = document.createElement("div");
+        rentalInfo.classList.add("alert", "alert-info", "mb-2");
+        rentalInfo.innerHTML = `
+            <strong>Marka:</strong> ${item.brandName} <br>
+            <strong>Model:</strong> ${item.modelName} <br>
+            <strong>Toplam Fiyat:</strong> ${item.totalPrice} TL <br>
+            <strong>Kiralayan:</strong> ${getCurrentUserName()} <br>
+            <strong>Kiralama Süresi:</strong> ${item.rentalPeriod} gün <br>
+            <strong>Pickup Adresi:</strong> ${item.pickupAddress} <br>
+            <strong>İade Adresi:</strong> ${item.returnAddress} <br>
+        `;
+        rentalDetailsDiv.appendChild(rentalInfo);
+    });
+}
     function clearRent() {
         rentItems = [];
         updateRent();
@@ -565,42 +654,21 @@ function updateMyRentals() {
         const brandSelect = document.getElementById("brandSelect");
         fetchCarByBrand(brandSelect.value);
     }
-    let rentedCars = []; // Kiralanmış araçların listesini tutacak dizi
+    let rentedCars = []; // Kiralanmış araçların listesini tutacak dizi 
+    function updateEndDate(selectedDate) {
+        const startDate = new Date(selectedDate);
+        const rentalPeriod = 3; 
+        startDate.setDate(startDate.getDate() + rentalPeriod);
 
-async function fetchRentedCars() {
-    try {
-        const response = await fetch(BASE_PATH + "rental/active", { // Aktif kiralamaları getir
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + jwtToken
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error("Failed to fetch rented cars, response status: " + response.status);
-        }
-        
-        rentedCars = await response.json(); // Kiralanmış araçları güncelle
-    } catch (error) {
-        console.error("Error fetching rented cars: ", error);
+        // Bitiş tarihini güncelle
+        document.getElementById("endRentalDate").value = startDate.toISOString().split("T")[0];
     }
-}
-function displayRentedCars(cars) {
-    const container = document.getElementById('rented-cars');
-    container.innerHTML = ''; // Önceki verileri temizle
-
-    cars.forEach(car => {
-        const carElement = document.createElement('div');
-        carElement.textContent = `Rental ID: ${car.rentalId}, Customer: ${car.firstName} ${car.lastName}, Car: ${car.name} ${car.modelName}`;
-        container.appendChild(carElement);
-    });
-}
-
+    
 document.addEventListener("DOMContentLoaded", async function () {
     updateRentalButtonVisibility();
-    await fetchRentedCars(); // Kiralanmış araçları yükle
     await fetchBrands();
+    await fetchRentedCars(); 
+   
 
     const brandSelect = document.getElementById("brandSelect");
 
@@ -609,8 +677,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         await fetchCarByBrand(this.value);
     });
 
-    await fetchCarByBrand(brandSelect.value); 
     updateMyRentals(); // Kullanıcının kiralamaları
+
 
     // Tarih seçicileri başlat
     $("#startRentalDate").datepicker({
@@ -624,39 +692,5 @@ document.addEventListener("DOMContentLoaded", async function () {
         dateFormat: "yy-mm-dd"
     });
 });
-
-// Kiralanmış araçları yükleme
-async function fetchRentedCars() {
-    try {
-        const response = await fetch(`${BASE_PATH}rental/customer/${customerId}`, { 
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + jwtToken
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch rented cars, response status: " + response.status);
-        }
-
-        const rentedCars = await response.json(); 
-        console.log(rentedCars); 
+updateRent();
         
-    } catch (error) {
-        console.error("Error fetching rented cars: ", error);
-    }
-}
-
-function updateEndDate(selectedDate) {
-    const startDate = new Date(selectedDate);
-    const rentalPeriod = 3; 
-    startDate.setDate(startDate.getDate() + rentalPeriod);
-
-    // Bitiş tarihini güncelle
-    document.getElementById("endRentalDate").value = startDate.toISOString().split("T")[0];
-}
-    
-/*todo
-rentnow butonu görünmüyor bak!!!
-car sekmesi için arabalar sayfası yap
-*/
