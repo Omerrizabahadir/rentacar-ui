@@ -1,5 +1,5 @@
 
- const jwtToken = localStorage.getItem("jwtToken");
+    const jwtToken = localStorage.getItem("jwtToken");
     const customerId = localStorage.getItem("customerId");
 
     const BASE_PATH = "http://localhost:8080/"
@@ -162,11 +162,11 @@
 
         // Kiralama detayları ile birlikte aracı myRentals'a ekle
         myRentals.push({
-            modelName: car.modelName, // Model adı
-            brandName: car.brandName, // Marka adı (varsa)
+            modelName: car.modelName, 
+            brandName: car.brandName,
             quantity: quantity,
             dailyPrice: dailyPrice,
-            totalPrice: totalPrice // Toplam fiyatı kaydet
+            totalPrice: totalPrice 
         });
 
             
@@ -323,8 +323,8 @@ function submitRental(car) {
             {
                 carId: rentalInfo.carId, 
                 quantity: rentalInfo.quantity,
-                startRentalDate: new Date(startRentalDate).toISOString(), // ISO 8601 formatına dönüştür
-                endRentalDate: new Date(endRentalDate).toISOString(), // ISO 8601 formatına dönüştür
+                startRentalDate: new Date(startRentalDate).toLocalDateString(),
+                endRentalDate: new Date(endRentalDate).toLocaleDateString, 
                 rentalPeriod: rentalDays, 
                 pickupAddress: pickupAddress,
                 returnAddress: returnAddress
@@ -568,11 +568,7 @@ function updateMyRentals() {
             const pickupAddress = document.getElementById("pickupAddress").value;
             const returnAddress = document.getElementById("returnAddress").value;
         
-            // Girişlerin kontrolü
-            if (!startRentalDate || !endRentalDate || !pickupAddress || !returnAddress) {
-                alert("Lütfen tüm alanları doldurun.");
-                return;
-            }
+            
         
             const rentalDays = calculateRentalDays(startRentalDate, endRentalDate);
         
@@ -608,13 +604,21 @@ function updateMyRentals() {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + jwtToken
                 },
-                body: JSON.stringify(requestBody)
-                
-            }).then(response => {
+                body: JSON.stringify(requestBody),
 
-                console.log("response :",response)
-                if(!response.ok){
-                    throw new Error("Rental request failed: " + response.message);
+            }) .then(response => {
+                if (!response.ok) {
+                    if (response.status === 400) {
+                        return response.json().then(errorData => {
+                            if (errorData.message && errorData.message.includes("already rented")) {
+                                // Eğer araba başka bir kullanıcı tarafından kiralanmışsa
+                                alert("Seçtiğiniz araba başka bir kullanıcı tarafından kiralanmıştır.");
+                                throw new Error("Araba kiralanmış durumda.");
+                            }
+                            throw new Error("Kiralama hatası: " + errorData.message);
+                        });
+                    }
+                    throw new Error("Rental request failed: " + response.status);
                 }
                 return response.json();
             }).then(data => {
@@ -663,6 +667,35 @@ function displayRentalDetails(rentalCarInfoList) {
         // Bitiş tarihini güncelle
         document.getElementById("endRentalDate").value = startDate.toISOString().split("T")[0];
     }
+
+    // Rental bilgilerini kaydet
+function saveRentalData(rental) {
+    localStorage.setItem('rentalId', rental.id);
+    localStorage.setItem('customerName', rental.userName);
+    localStorage.setItem('carModel', rental.carModel);
+    localStorage.setItem('startDate', rental.startDate);
+    localStorage.setItem('endDate', rental.endDate);
+    localStorage.setItem('pickupAddress', rental.pickupAddress);
+    localStorage.setItem('returnAddress', rental.returnAddress);
+    localStorage.setItem('totalPrice', rental.totalPrice);
+
+}
+    // Örnek kiralama verisi ile test
+const rental = {
+    id: 1,
+    userName: 'Hkdemircan',
+    carModel: 'Porsche Taycan 2012',
+    startDate: '2023-11-16',
+    endDate: '2023-11-17',
+    pickupAddress: 'İstanbul',
+    returnAddress: 'Ankara',
+    totalPrice: 500.00
+};
+
+
+// Kiralama verisini kaydetme fonksiyonunu çağırın
+saveRentalData(rental);
+
     
 document.addEventListener("DOMContentLoaded", async function () {
     updateRentalButtonVisibility();
@@ -693,4 +726,3 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 });
 updateRent();
-        
