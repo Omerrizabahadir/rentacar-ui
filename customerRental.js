@@ -6,6 +6,7 @@ const jwtToken = localStorage.getItem("jwtToken");
 async function fetchRentedCars() {
     try {
         const response = await fetch(`${BASE_PATH}rental/customer/${customerId}`, { 
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + jwtToken
@@ -52,20 +53,19 @@ function displayRentedCars(cars) {
         const rentalInfo = document.createElement('div');
         rentalInfo.classList.add('rental-info'); // Stil eklemek için sınıf
 
-        const startRentalDateFormatted = car.startRentalDate ? formatDate(car.startRentalDate) : "Tarih yok";
-        const endRentalDateFormatted = car.endRentalDate ? formatDate(car.endRentalDate) : "Tarih yok";
+        
         const totalPrice = car.totalPrice !== undefined ? car.totalPrice.toFixed(2) : "Bilinmiyor";
 
         rentalInfo.innerHTML = `
             <strong>Marka:</strong> ${car.name} <br>
             <strong>Model:</strong> ${car.modelName} <br>
-            <strong>Toplam Fiyat:</strong> ${totalPrice} TL <br>
+            <strong>Toplam Fiyat:</strong> ${car.totalPrice} TL <br>
             <strong>Kiralayan:</strong> ${car.firstName} ${car.lastName} <br>
-            <strong>Kiralama Süresi:</strong> ${car.totalRentalPeriodDays} gün <br>
             <strong>Alış Adresi:</strong> ${car.pickupAddress || "Bilinmiyor"} <br> 
             <strong>İade Adresi:</strong> ${car.returnAddress || "Bilinmiyor"} <br> 
             <strong>Kiralama Başlangıç Tarihi :</strong> ${car.startRentalDate}<br>
             <strong>Kiralama Bitiş Tarihi :</strong> ${car.endRentalDate} <br>
+            <strong>Kiralama Süresi:</strong> ${car.totalRentalPeriodDays} gün <br>
         `;
 
         container.appendChild(rentalInfo);

@@ -137,7 +137,7 @@
                     throw new Error("Failed to fetch rented cars, response status: " + response.status);
                 }
                 
-                rentedCars = await response.json(); // Kiralanmış araçları güncelle
+                rentedCars = await response.json(); 
             } catch (error) {
                 console.error("Error fetching rented cars: ", error);
             }
@@ -166,7 +166,11 @@
             brandName: car.brandName,
             quantity: quantity,
             dailyPrice: dailyPrice,
-            totalPrice: totalPrice 
+            totalPrice: totalPrice,
+            startRentalDate: document.getElementById("startRentalDate").value,
+            endRentalDate: document.getElementById("endRentalDate").value,
+            pickupAddress: document.getElementById("pickupAddress").value,
+            returnAddress: document.getElementById("returnAddress").value
         });
 
             
@@ -323,8 +327,8 @@ function submitRental(car) {
             {
                 carId: rentalInfo.carId, 
                 quantity: rentalInfo.quantity,
-                startRentalDate: new Date(startRentalDate).toLocalDateString(),
-                endRentalDate: new Date(endRentalDate).toLocaleDateString, 
+                startRentalDate: new Date(startRentalDate).toLocaleString(),
+                endRentalDate: new Date(endRentalDate).toLocaleString, 
                 rentalPeriod: rentalDays, 
                 pickupAddress: pickupAddress,
                 returnAddress: returnAddress
@@ -416,6 +420,8 @@ function getCurrentUserName() {
 
         document.getElementById("calculatePriceButton").onclick = function() {
             calculateModalPrice(dailyPrice);
+
+       
 
         
         document.getElementById("confirmRentalButton").onclick = function() {
@@ -542,9 +548,9 @@ function updateMyRentals() {
         }
     }
     
-    function calculateRentalDays(startDate, endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
+    function calculateRentalDays(startRentalDate, endRentalDate) {
+        const start = new Date(startRentalDate);
+        const end = new Date(endRentalDate);
         const timeDifference = end - start; // Zaman farkı milisaniye cinsinden
         const dayDifference = Math.ceil(timeDifference / (1000 * 3600 * 24)); // Gün sayısını hesapla
         return dayDifference >= 0 ? dayDifference : 0; // Eğer negatifse sıfır döndür
