@@ -567,7 +567,7 @@ function updateMyRentals() {
             const endRentalDate = document.getElementById("endRentalDate").value;
             const pickupAddress = document.getElementById("pickupAddress").value;
             const returnAddress = document.getElementById("returnAddress").value;
-        
+            const totalRentalPertiodDays = document.getElementById("totalRentalPertiodDays");
             
         
             const rentalDays = calculateRentalDays(startRentalDate, endRentalDate);
@@ -583,7 +583,7 @@ function updateMyRentals() {
                 quantity: rentalQuantity,
                 startRentalDate: new Date(startRentalDate).toISOString(), // ISO formatında
                 endRentalDate: new Date(endRentalDate).toISOString(),
-                rentalPeriod: rentalDays,
+                rentalPeriod: totalRentalPertiodDays,
                 pickupAddress: pickupAddress,
                 returnAddress: returnAddress
             };
@@ -644,7 +644,7 @@ function displayRentalDetails(rentalCarInfoList) {
             <strong>Model:</strong> ${item.modelName} <br>
             <strong>Toplam Fiyat:</strong> ${item.totalPrice} TL <br>
             <strong>Kiralayan:</strong> ${getCurrentUserName()} <br>
-            <strong>Kiralama Süresi:</strong> ${item.rentalPeriod} gün <br>
+            <strong>Kiralama Süresi:</strong> ${item.totalRentalPeriodDays} gün <br>
             <strong>Pickup Adresi:</strong> ${item.pickupAddress} <br>
             <strong>İade Adresi:</strong> ${item.returnAddress} <br>
         `;
@@ -670,32 +670,15 @@ function displayRentalDetails(rentalCarInfoList) {
 
     // Rental bilgilerini kaydet
 function saveRentalData(rental) {
-    localStorage.setItem('rentalId', rental.id);
-    localStorage.setItem('customerName', rental.userName);
-    localStorage.setItem('carModel', rental.carModel);
+    
     localStorage.setItem('startDate', rental.startDate);
     localStorage.setItem('endDate', rental.endDate);
     localStorage.setItem('pickupAddress', rental.pickupAddress);
     localStorage.setItem('returnAddress', rental.returnAddress);
+    localStorage.setItem('totalRentalPeriodDays',totalRentalPeriodDays);
     localStorage.setItem('totalPrice', rental.totalPrice);
 
 }
-    // Örnek kiralama verisi ile test
-const rental = {
-    id: 1,
-    userName: 'Hkdemircan',
-    carModel: 'Porsche Taycan 2012',
-    startDate: '2023-11-16',
-    endDate: '2023-11-17',
-    pickupAddress: 'İstanbul',
-    returnAddress: 'Ankara',
-    totalPrice: 500.00
-};
-
-
-// Kiralama verisini kaydetme fonksiyonunu çağırın
-saveRentalData(rental);
-
     
 document.addEventListener("DOMContentLoaded", async function () {
     updateRentalButtonVisibility();

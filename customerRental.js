@@ -2,6 +2,7 @@ const BASE_PATH = 'http://localhost:8080/';
 const customerId = localStorage.getItem("customerId"); 
 const jwtToken = localStorage.getItem("jwtToken"); 
 
+// Kiralanan araçları fetch eden fonksiyon
 async function fetchRentedCars() {
     try {
         const response = await fetch(`${BASE_PATH}rental/customer/${customerId}`, { 
@@ -10,19 +11,31 @@ async function fetchRentedCars() {
                 'Authorization': 'Bearer ' + jwtToken
             }
         });
-        console.log("response : ", response)
+        console.log("response : ", response);
+        
         if (!response.ok) {
             throw new Error("Failed to fetch rented cars, response status: " + response.status);
         }
 
         const rentedCars = await response.json(); 
-         console.log("Rented Cars Data:", rentedCars);
+        console.log("Rented Cars Data:", rentedCars);
         displayRentedCars(rentedCars); 
     } catch (error) {
         console.error("Error fetching rented cars: ", error);
     }
 }
-
+/*
+// Tarihleri özel formatta gösterme fonksiyonu
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}.${year}`;
+}
+*/
+// Kiralanan araçları ekranda gösterme fonksiyonu
 function displayRentedCars(cars) {
     const container = document.getElementById('rented-cars');
     container.innerHTML = '';
@@ -32,16 +45,16 @@ function displayRentedCars(cars) {
         console.log("Total Price:", car.totalPrice);
         console.log("Start Rental Date:", car.startRentalDate); 
         console.log("End Rental Date:", car.endRentalDate); 
+        console.log("car.totalRentalPeriodDays", car.totalRentalPeriodDays);
 
+
+        
         const rentalInfo = document.createElement('div');
-        rentalInfo.classList.add('rental-info'); // Stil eklemek için bir sınıf ekleyebilirsiniz
+        rentalInfo.classList.add('rental-info'); // Stil eklemek için sınıf
 
-        // Tarihleri kullanıcı dostu formatta gösterme
-        const startRentalDateFormatted = new Date(car.startRentalDate).toLocaleString(); // Tarih formatı güncellendi
-        const endRentalDateFormatted = new Date(car.endRentalDate).toLocaleString(); // Tarih formatı güncellendi
-
-        // Toplam fiyat kontrolü
-        const totalPrice = car.totalPrice !== undefined ? car.totalPrice.toFixed(2) : "Bilinmiyor"; // Fiyat iki ondalık basamağa yuvarlandı
+        const startRentalDateFormatted = car.startRentalDate ? formatDate(car.startRentalDate) : "Tarih yok";
+        const endRentalDateFormatted = car.endRentalDate ? formatDate(car.endRentalDate) : "Tarih yok";
+        const totalPrice = car.totalPrice !== undefined ? car.totalPrice.toFixed(2) : "Bilinmiyor";
 
         rentalInfo.innerHTML = `
             <strong>Marka:</strong> ${car.name} <br>
@@ -49,37 +62,15 @@ function displayRentedCars(cars) {
             <strong>Toplam Fiyat:</strong> ${totalPrice} TL <br>
             <strong>Kiralayan:</strong> ${car.firstName} ${car.lastName} <br>
             <strong>Kiralama Süresi:</strong> ${car.totalRentalPeriodDays} gün <br>
-            <strong>Pickup Adresi:</strong> ${car.pickupAddress || "Bilinmiyor"} <br> 
+            <strong>Alış Adresi:</strong> ${car.pickupAddress || "Bilinmiyor"} <br> 
             <strong>İade Adresi:</strong> ${car.returnAddress || "Bilinmiyor"} <br> 
-            <strong>Kiralama Başlangıç Tarihi :</strong> ${startRentalDateFormatted}<br>
-            <strong>Kiralama Bitiş Tarihi :</strong> ${endRentalDateFormatted} <br>
+            <strong>Kiralama Başlangıç Tarihi :</strong> ${car.startRentalDate}<br>
+            <strong>Kiralama Bitiş Tarihi :</strong> ${car.endRentalDate} <br>
         `;
 
         container.appendChild(rentalInfo);
     });
 }
-
-// Local Storage'dan verileri al
-function loadRentalData() {
-    const rentalId = localStorage.getItem('rentalId');
-    const customerName = localStorage.getItem('customerName');
-    const carModel = localStorage.getItem('carModel');
-    const startDate = localStorage.getItem('startDate');
-    const endDate = localStorage.getItem('endDate');
-    const pickupAddress = localStorage.getItem('pickupAddress');
-    const returnAddress = localStorage.getItem('returnAddress');
-    const totalPrice = localStorage.getItem('totalPrice');
-
-    console.log("Rental ID:", rentalId);
-    console.log("Customer Name:", customerName);
-    console.log("Car Model:", carModel);
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
-    console.log("Pickup Address:", pickupAddress);
-    console.log("Return Address:", returnAddress);
-    console.log("Total Price:", totalPrice);
-}
-
 
 // Sayfa yüklendiğinde kiralanmış araçları getir
 document.addEventListener('DOMContentLoaded', () => {
