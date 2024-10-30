@@ -2,7 +2,7 @@ const BASE_PATH = "http://localhost:8080/"
 const BASE_IMAGE_PATH = "/Users/macbook/Documents/GitHub/rentacar/"
 const jwtToken = localStorage.getItem('jwtToken');
 
-var currentCarId = 0;
+
 var brands = [];
 
 async function addCar(){
@@ -320,21 +320,43 @@ function confirmDeletion() {
 });
 }
 */
-function showDeleteCarModal(carId){
-    currentCarId=carId
-    const deleteCarModal =  bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteCarModal'))
-    deleteCarModal.show();
+let currentCarId = null;
+
+// Function to show the delete modal and store the car ID
+function showDeleteCarModal(carId) {
+    currentCarId = carId;
+    console.log("show delete:", carId);
+
+    const modalElement = document.getElementById('deleteCarModal');
+
+    // If modal element exists, show the modal
+    if (modalElement) {
+        const deleteCarModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        deleteCarModal.show();
+    } else {
+        console.error("Modal element 'deleteCarModal' not found.");
+    }
 }
 
-function deleteCar(){
-   
-    //const confirmed = confirm("Are you sure you want to delete car?");
-    
-   
-    if(currentCarId !==0){
-        console.error('No car ID available for deletion.');
-        return;
+// Function to delete the car using the stored car ID
+function deleteCar() {
+    if (currentCarId !== null) {
+        console.log("Deleting car with ID:", currentCarId);
+        // Add your delete logic here (e.g., send an AJAX request to delete the car)
+        
+        // Example: Show a success message
+        //alert(⁠ Car with ID ${currentCarId} deleted successfully. ⁠);
+        // Hide the modal after deletion
+        const modalElement = document.getElementById('deleteCarModal');
+        const deleteCarModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        deleteCarModal.hide();
+
+        // Reset currentCarId
+        currentCarId = null;
+    } else {
+        console.error("No car ID set for deletion.");
     }
+
         fetch(BASE_PATH + "car/" + currentCarId, {
             method: 'DELETE',
             headers: {
