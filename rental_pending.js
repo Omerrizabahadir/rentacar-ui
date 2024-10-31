@@ -1,7 +1,6 @@
 const BASE_PATH = "http://localhost:8080/";
 const jwtToken = localStorage.getItem('jwtToken');
 
-
 async function getPendingRentals() {
     try {
         const response = await fetch(BASE_PATH + "rental/pending", {
@@ -13,10 +12,12 @@ async function getPendingRentals() {
         });
 
         if (!response.ok) {
+            console.error("HTTP error! status: " + response.status);
             throw new Error("HTTP error! status: " + response.status);
         }
 
         const rentals = await response.json();
+        console.log("Pending rentals fetched successfully:", rentals);
         renderPendingRentals(rentals);
     } catch (error) {
         console.error("Error fetching pending rentals:", error);
@@ -30,15 +31,16 @@ function renderPendingRentals(rentals) {
         return;
     }
 
+    console.log("Rendering pending rentals:", rentals);
     pendingRentalsList.innerHTML = rentals.map(rental => {
+        
+        const customerName = `${rental.firstName} ${rental.lastName}`;
 
-        const rentalId = rental.id;
-        console.log("Rental ID:", rental.rentalId);
         return `
-           
          <tr>
-                <td>${rental.customerName}</td>
-                <td>${rental.carModel}</td>
+                <td>${customerName}</td>
+                <td>${rental.brandName}</td>
+                <td>${rental.modelName}</td>
                 <td>${rental.startRentalDate}</td>
                 <td>${rental.endRentalDate}</td>
                 <td>
@@ -50,6 +52,7 @@ function renderPendingRentals(rentals) {
 }
 
 async function confirmDelivery(rentalId) {
+    console.log("Confirming delivery for rental ID:", rentalId);
     try {
         const response = await fetch(BASE_PATH + "rental/return/" + rentalId, {
             method: 'PUT',
@@ -60,11 +63,12 @@ async function confirmDelivery(rentalId) {
         });
 
         if (!response.ok) {
+            console.error("Failed to confirm delivery, status: " + response.status);
             throw new Error("Failed to confirm delivery: " + response.status);
         }
-        
+
         alert('Rental confirmed successfully!');
-        getPendingRentals(); // Listeyi güncelle
+        getPendingRentals(); 
     } catch (error) {
         console.error("Error confirming delivery:", error);
         alert('Teslimat onaylanırken bir hata oluştu.');
