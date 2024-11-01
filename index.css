@@ -38,4 +38,24 @@
 .modal {
     z-index: 1050 !important; /* Modal kendisi için z-index */
 }
+.car-image {
+    width: 100%;
+    height: auto;
+}
+
+
+/* Footer için sağa ve sola yaslama */
+.footer {
+    background-color: #343a40; /* Koyu arka plan rengi */
+    color: white; /* Yazı rengi */
+    text-align: center; /* Metni ortala */
+    padding: 15px 0; /* Üst ve alt boşluk, sağ ve sol sıfır */
+    width: 100vw; /* Tam genişlikte göster */
+    margin: 0; /* Kenar boşluklarını sıfırla */
+    position: fixed; /* Sabit pozisyonda kalması için */
+    bottom: 0; /* Alt kenara yasla */
+    left: 0; /* Sola yasla */
+    right: 0; /* Sağa yasla */
+    z-index: 1000; /* Üstte görünmesi için z-index */
+}
 
