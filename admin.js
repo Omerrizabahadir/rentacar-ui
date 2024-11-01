@@ -270,56 +270,6 @@ function clearModalValues(){
      
 }
 
-//---------------------------------DELETE-------------------------------
-   /* 
-function deleteCar(carId){
-    if(!carId){
-        console.log("Car id is undefined or invalid")
-        return;
-    }
-    currentCarId = carId;
-
-    //Delete Confirm Modalını gösterme
-    const confirmDeleteModal = new bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteModal'));
-    confirmDeleteModal.show();
-}
-
-function confirmDeletion() {
-    console.log("Confirm deletion called for ID:", currentCarId);  
-    
-    if (currentCarId === 0) {  
-        console.error('No car ID available for deletion.');
-        return;      
-    }
-
-    fetch(BASE_PATH + "car/" + currentCarId, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + jwtToken
-        }
-    }).then(response => {
-        console.log("Fetch isteği yapıldı:", response);
-
-        if (!response.ok) {
-            throw new Error("Car delete request failed code status: " + response.status);
-        }
-        showSuccessAlert('Car is successfully deleted!');
-        getAllCar();
-        hideProductModal('confirmDeleteButton');
-
-    }).catch(error => {
-        console.error('Error: ', error);
-        showFailAlert('An error occurred while deleting the car');
-    }).finally(() => {
-        const confirmDeleteModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmDeleteModal'));
-        if (confirmDeleteModal) {
-            confirmDeleteModal.hide();
-        }
-    currentCarId = 0;
-});
-}
-*/
 let currentCarId = null;
 
 // Function to show the delete modal and store the car ID
@@ -351,8 +301,7 @@ function deleteCar() {
         const deleteCarModal = bootstrap.Modal.getOrCreateInstance(modalElement);
         deleteCarModal.hide();
 
-        // Reset currentCarId
-        currentCarId = null;
+    
     } else {
         console.error("No car ID set for deletion.");
     }
@@ -383,6 +332,8 @@ function deleteCar() {
         currentCarId = 0;
     });
 }
+    
+
 //showing and filling brands with select menu
 function displayBrandsWithSelectMenu(brands){
     const brandSelect = document.getElementById('updateCarBrandSelect');

@@ -1,24 +1,30 @@
-alertlerin Css */
 #success-alert,
 #fail-alert {                   
     display: none;
     position: fixed;
-    top: 20px;
+    top: 25px;
     right: 20px;
-    z-index: 1000;
+    z-index: 1040;
     width: 300px;
-    padding: 15px;
+    padding: 20px;
+   
 }
 #success-alert .close{
-    position: absolute;
-    top: 1px;
-    right: -15px;
-    z-index: 1040; 
- /* alertin .close düğmesinin görünümünü kontrol etmek için  alert içindeki x işareti yazının altında kaldığı için ekledim*/
-}
- #fail-alert .close {
-    position: absolute;
-    top: 1px;
-    right: -15px;
-    z-index: 1040; /* Kapatma düğmesini uyarının üzerinde göstermek için */
-}
+        position: absolute;
+        top: 13px;
+        right: -6px;
+        z-index: 1040; /* Kapatma düğmesini uyarının üzerinde göstermek için */
+        
+    }
+
+    /* alertin .close düğmesinin görünümünü kontrol etmek için  alert içindeki x işareti yazının altında kaldığı için ekledim*/
+    #fail-alert .close {
+        position: absolute;
+        top: 1px;
+        right: -15px;
+        z-index: 1040; /* Kapatma düğmesini uyarının üzerinde göstermek için */
+    }
+
+    table{
+        text-align: center;
+    }
