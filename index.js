@@ -100,8 +100,8 @@
                 carImage.src = BASE_IMAGE_PATH + car.image
                 carImage.alt = car.name;
                 carImage.classList.add("card-img-top");
-                carImage.style.maxWidth = "175px";
-                carImage.style.maxHeight = "175px";
+                carImage.style.maxWidth = "300px";
+                carImage.style.maxHeight = "300px";
     
                 const cardBody = document.createElement("div");
                 cardBody.classList.add("cart-body");
@@ -111,7 +111,7 @@
                 <p class="card-text text-muted">${car.gearBox}</p> 
                 <p class="card-text fw-bold fs-5">${car.dailyPrice} TL</p> 
                 <p class="card-text"><small class="text-secondary">${car.carStatus}</small></p> 
-                <button class="btn btn-success mt-3" onclick='openRentalModal(${JSON.stringify(car)})'>Add To Rental</button> 
+                <button class="btn btn-success mt-3" onclick='openRentalModal(${JSON.stringify(car)})'>Rent Now!</button> 
             </div>
         `;
     
@@ -421,8 +421,6 @@ function getCurrentUserName() {
         document.getElementById("calculatePriceButton").onclick = function() {
             calculateModalPrice(dailyPrice);
 
-       
-
         
         document.getElementById("confirmRentalButton").onclick = function() {
             const quantity = document.getElementById("rentalQuantity").value;
@@ -508,7 +506,14 @@ function updateMyRentals() {
         const rentalDays = calculateRentalDays(rental.startRentalDate, rental.endRentalDate);
         const rentalPrice = rentalDays * (rental.dailyPrice || 0); // Günlük fiyatı kullanarak hesapla
 
-        rentalItem.innerText = `Araç ID: ${rental.carId}, Miktar: ${rental.quantity}, Başlangıç Tarihi: ${rental.startRentalDate}, Bitiş Tarihi: ${rental.endRentalDate}, Alış Adresi: ${rental.pickupAddress}, Dönüş Adresi: ${rental.returnAddress}, Aracın Toplam Kiralama Bedeli: ${rentalPrice} TL`;
+        rentalItem.innerHTML = `
+            <strong>Miktar:</strong> ${rental.quantity}, 
+            <strong>Başlangıç Tarihi:</strong> ${rental.startRentalDate}, 
+            <strong>Bitiş Tarihi:</strong> ${rental.endRentalDate}, 
+            <strong>Alış Adresi:</strong> ${rental.pickupAddress}, 
+            <strong>Dönüş Adresi:</strong> ${rental.returnAddress}, 
+            <strong>Aracın Toplam Kiralama Bedeli:</strong> ${rentalPrice}TL
+            `;
         
         myRentalsList.appendChild(rentalItem);
 
