@@ -37,6 +37,7 @@ function formatDate(dateString) {
 }
 */
 // Kiralanan araçları ekranda gösterme fonksiyonu
+// Kiralanan araçları ekranda gösterme fonksiyonu
 function displayRentedCars(cars) {
     const container = document.getElementById('rented-cars');
     container.innerHTML = '';
@@ -48,18 +49,18 @@ function displayRentedCars(cars) {
         console.log("End Rental Date:", car.endRentalDate); 
         console.log("car.totalRentalPeriodDays", car.totalRentalPeriodDays);
 
-
-        
         const rentalInfo = document.createElement('div');
         rentalInfo.classList.add('rental-info'); // Stil eklemek için sınıf
 
-        
-        const totalPrice = car.totalPrice !== undefined ? car.totalPrice.toFixed(2) : "Bilinmiyor";
+        // 'totalPrice' değeri null veya undefined ise uygun bir değer kullanma
+        const totalPrice = (car.totalPrice !== null && car.totalPrice !== undefined)
+            ? car.totalPrice.toFixed(2) // Fiyatı iki ondalıklı göster
+            : "Bilinmiyor"; // Fiyat bilgisi yoksa "Bilinmiyor" yaz
 
         rentalInfo.innerHTML = `
             <strong>Marka:</strong> ${car.name} <br>
             <strong>Model:</strong> ${car.modelName} <br>
-            <strong>Toplam Fiyat:</strong> ${car.totalPrice} TL <br>
+            <strong>Toplam Fiyat:</strong> ${totalPrice} TL <br>
             <strong>Kiralayan:</strong> ${car.firstName} ${car.lastName} <br>
             <strong>Alış Adresi:</strong> ${car.pickupAddress || "Bilinmiyor"} <br> 
             <strong>İade Adresi:</strong> ${car.returnAddress || "Bilinmiyor"} <br> 
@@ -71,6 +72,7 @@ function displayRentedCars(cars) {
         container.appendChild(rentalInfo);
     });
 }
+
 
 // Sayfa yüklendiğinde kiralanmış araçları getir
 document.addEventListener('DOMContentLoaded', () => {

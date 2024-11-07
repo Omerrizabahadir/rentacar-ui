@@ -606,23 +606,19 @@ function updateMyRentals() {
                 rentalList: [rentalInfo]
             };
         
-            
             fetch(BASE_PATH + "rental", {
-    
                 method: 'POST',
-                body: JSON.stringify(requestBody),
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + jwtToken
                 },
-                body: JSON.stringify(requestBody),
-
-            }) .then(response => {
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => {
                 if (!response.ok) {
                     if (response.status === 400) {
                         return response.json().then(errorData => {
                             if (errorData.message && errorData.message.includes("already rented")) {
-                                // Eğer araba başka bir kullanıcı tarafından kiralanmışsa
                                 alert("Seçtiğiniz araba başka bir kullanıcı tarafından kiralanmıştır.");
                                 throw new Error("Araba kiralanmış durumda.");
                             }
@@ -632,17 +628,19 @@ function updateMyRentals() {
                     throw new Error("Rental request failed: " + response.status);
                 }
                 return response.json();
-            }).then(data => {
+            })
+            .then(data => {
                 console.log(data);
                 myRentals.push(rentalInfo);
                 updateMyRentals();
                 closeModal();
-            }).catch(error => {
+            })
+            .catch(error => {
                 console.error("Error in rentNow function: ", error);
                 closeModal();
             });
-        }
-        
+        }   
+            
         // Kiralama detaylarını gösteren fonksiyon
 function displayRentalDetails(rentalCarInfoList) {
     const rentalDetailsDiv = document.getElementById("rentalDetails");

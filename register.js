@@ -31,6 +31,36 @@ fetch(BASE_PATH + "customer/register", {
     console.log(data)
     window.location.href = "login.html"
 }).catch(error => {
-    console.error("Error : ", error);
+    console.error("Error : ", error); // Hata nesnesini logla
+    if (error.response) {
+        // Sunucudan gelen hata mesajını kontrol et
+        console.error("Response data: ", error.response.data);
+        console.error("Response status: ", error.response.status);
+        console.error("Response headers: ", error.response.headers);
+        alert('Sunucu hatası: ' + error.response.data.message); // Eğer sunucu özel bir hata mesajı döndüyse
+    } else if (error.request) {
+        // İstek yapıldı ama yanıt alınamadı
+        console.error("Request data: ", error.request);
+        alert('İstek gönderildi ama yanıt alınamadı. Lütfen bağlantınızı kontrol edin.');
+    } else {
+        // Diğer hatalar
+        console.error("Error message: ", error.message);
+        alert('Bir hata oluştu: ' + error.message);
+    }
 });
+}
+
+//veritabanımda kayıtlı email ile giriş yaparsa hata verecek
+function displayError(message) {
+    // Get or create error message container
+    let errorContainer = document.getElementById('error-message');
+    if (!errorContainer) {
+        errorContainer = document.createElement('div');
+        errorContainer.id = 'error-message';
+        errorContainer.className = 'alert alert-danger d-none';
+        document.querySelector('.container').prepend(errorContainer);
+    }
+    
+    errorContainer.textContent = message;
+    errorContainer.classList.remove('d-none'); // Show the error message
 }
