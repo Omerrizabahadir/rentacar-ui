@@ -57,17 +57,12 @@ function displayRentedCars(cars) {
             ? car.totalPrice.toFixed(2) // Fiyatı iki ondalıklı göster
             : "Bilinmiyor"; // Fiyat bilgisi yoksa "Bilinmiyor" yaz
 
+        // Bilgileri istenilen formatta hazırlama
         rentalInfo.innerHTML = `
-            <strong>Marka:</strong> ${car.name} <br>
-            <strong>Model:</strong> ${car.modelName} <br>
-            <strong>Toplam Fiyat:</strong> ${totalPrice} TL <br>
-            <strong>Kiralayan:</strong> ${car.firstName} ${car.lastName} <br>
-            <strong>Alış Adresi:</strong> ${car.pickupAddress || "Bilinmiyor"} <br> 
-            <strong>İade Adresi:</strong> ${car.returnAddress || "Bilinmiyor"} <br> 
-            <strong>Kiralama Başlangıç Tarihi :</strong> ${car.startRentalDate}<br>
-            <strong>Kiralama Bitiş Tarihi :</strong> ${car.endRentalDate} <br>
-            <strong>Kiralama Süresi:</strong> ${car.totalRentalPeriodDays} gün <br>
+            <p>Araba kiraladım,  ${car.startRentalDate} - ${car.endRentalDate} arasında kiralandı, 
+            ${totalPrice} TL ödendi.</p>
         `;
+
 
         container.appendChild(rentalInfo);
     });
