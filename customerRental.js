@@ -59,7 +59,7 @@ function displayRentedCars(cars) {
 
         // Bilgileri istenilen formatta hazırlama
         rentalInfo.innerHTML = `
-            <p>Araba kiraladım,  ${car.startRentalDate} - ${car.endRentalDate} arasında kiralandı, 
+            <p>${car.name} - ${car.modelName} kiraladım,  ${car.startRentalDate} - ${car.endRentalDate} arasında kiralandı, 
             ${totalPrice} TL ödendi.</p>
         `;
 
